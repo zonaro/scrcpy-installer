@@ -110,7 +110,9 @@ Extra params (not scrcpy flags):
 `shortcut-name`, `version` (latest|v4.1|v3.3.4|any other tag),
 `K|M|G` (bare = physical keyboard/mouse/gamepad),
 `icon-bg|icon-fg|icon-screen|icon-eyes` (hex, same defaults as installer),
-`os` (linux|windows — selects the installer variant in the page).
+`os` (linux|windows — selects the installer variant in the page; auto-detected
+from the browser when absent, explicit `?os=` / manual toggle wins and is
+remembered in localStorage `scrcpy-gen-os`).
 Full example:
 `?shortcut-name=TV&version=v4.1&max-size=1024&no-audio&video-codec=h265&fullscreen&icon-bg=%23000000`
 Precedence on load: `#hash` state first, then query string (query wins),
