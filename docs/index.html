@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>scrcpy-installer — gerador de comando</title>
+<meta name="description" content="Configure o scrcpy por formulário e gere um comando oneliner que instala e cria um atalho .desktop com a sua configuração.">
+<style>
+:root{
+  --bg:#0d1117; --panel:#161b22; --panel2:#1c2330; --border:#30363d;
+  --fg:#e6edf3; --muted:#8b949e; --accent:#30dd81; --accent2:#077063;
+  --warn:#d29922; --err:#f85149; --radius:12px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header.hero{padding:48px 20px 32px;text-align:center;background:linear-gradient(135deg,#0d1117,#077063 160%)}
+header.hero h1{margin:0 0 8px;font-size:2rem}
+header.hero h1 .tint{color:var(--accent)}
+header.hero p{color:var(--muted);max-width:720px;margin:8px auto}
+header.hero .links a{color:var(--accent);margin:0 10px;text-decoration:none}
+header.hero .links a:hover{text-decoration:underline}
+.langbar{margin-top:14px}
+.langbar select{background:var(--panel);color:var(--fg);border:1px solid var(--border);border-radius:8px;padding:6px 10px}
+main{max-width:1080px;margin:0 auto;padding:20px;display:grid;gap:16px}
+section.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+section.card h2{margin:0 0 4px;font-size:1.15rem}
+section.card p.hint{margin:0 0 12px;color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:4px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.field label{font-weight:600;font-size:.9rem}
+.field label code{color:var(--accent);font-weight:400;font-size:.8rem}
+.field small{color:var(--muted);font-size:.78rem}
+.field input[type=text],.field input[type=number],.field select{background:#0d1117;color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:7px 9px;width:100%}
+.field input[type=color]{width:100%;height:38px;border:1px solid var(--border);border-radius:6px;background:#0d1117;padding:2px}
+.checkrow{display:flex;align-items:center;gap:8px}
+.checkrow input{width:18px;height:18px;accent-color:var(--accent)}
+details.adv{margin-top:10px}
+details.adv summary{cursor:pointer;color:var(--accent)}
+#result{position:sticky;bottom:0;background:#0b0e13;border:1px solid var(--accent2);border-radius:var(--radius);padding:16px 18px}
+#result h2{margin-top:0}
+pre{background:#000;border:1px solid var(--border);border-radius:8px;padding:12px;overflow-x:auto;font-size:.85rem;white-space:pre-wrap;word-break:break-all}
+pre code{color:#a5f3c0}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+button{background:var(--accent);color:#04120a;border:none;border-radius:8px;padding:10px 18px;font-weight:700;cursor:pointer;font-size:.95rem}
+button.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+button:hover{filter:brightness(1.1)}
+#warnings{color:var(--warn);font-size:.9rem}
+#warnings .err{color:var(--err)}
+.preview{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:center;margin-top:10px}
+.preview svg{width:110px;height:110px;background:#222;border-radius:12px}
+footer{text-align:center;color:var(--muted);padding:24px;font-size:.85rem}
+footer a{color:var(--accent)}
+@media(max-width:640px){.preview{grid-template-columns:1fr}header.hero h1{font-size:1.5rem}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <h1>scrcpy<span class="tint">-installer</span> <span data-i18n="gen">— gerador de comando</span></h1>
+  <p data-i18n="sub">Configure o scrcpy pelo formulário. No final, um comando copiável instala o scrcpy do repositório oficial, adiciona ao PATH e cria um atalho .desktop com a sua configuração e ícone personalizado.</p>
+  <div class="links">
+    <a href="https://github.com/Genymobile/scrcpy" target="_blank" rel="noopener">Genymobile/scrcpy</a>
+    <a href="https://github.com/zonaro/scrcpy-installer" target="_blank" rel="noopener">zonaro/scrcpy-installer</a>
+  </div>
+  <div class="langbar">
+    <select id="lang" aria-label="language">
+      <option value="pt">Português (BR)</option>
+      <option value="en">English</option>
+      <option value="es">Español</option>
+    </select>
+  </div>
+</header>
+<main>
+  <section class="card" id="s-shortcut">
+    <h2 data-i18n="s1">1. Atalho e versão</h2>
+    <p class="hint" data-i18n="s1h">O nome vira o título e o arquivo .desktop (ex.: “Meu Celular” → meu-celular.desktop).</p>
+    <div class="grid">
+      <div class="field"><label for="shortcutName">Nome da configuração</label><input type="text" id="shortcutName" value="Meu Celular"><small>slug: <span id="slugPrev">meu-celular</span>.desktop</small></div>
+      <div class="field"><label for="scrVersion">Versão do scrcpy <code>--version</code></label>
+        <select id="scrVersion"><option value="latest">latest (padrão)</option><option value="v4.1">v4.1</option><option value="v3.3.4">v3.3.4</option><option value="custom">custom…</option></select></div>
+      <div class="field" id="customVerWrap" hidden><label for="customVer">Tag custom</label><input type="text" id="customVer" placeholder="v3.3.4"></div>
+    </div>
+  </section>
+
+  <section class="card" id="s-conn">
+    <h2 data-i18n="s2">2. Conexão</h2>
+    <p class="hint">USB por padrão. Preencha serial/TCP-IP só se precisar.</p>
+    <div class="grid">
+      <div class="field"><label for="serial">Serial <code>--serial</code></label><input type="text" id="serial" placeholder="emulator-5554"></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="selUsb"> USB <code>-d</code></label><small>Força device USB</small></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="selTcpip"> TCP/IP <code>-e</code></label><small>Força device TCP/IP</small></div>
+      <div class="field"><label for="tcpip">TCP/IP <code>--tcpip[=ip]</code></label><input type="text" id="tcpip" placeholder="192.168.1.42:5555"><small>Vazio + marcado = auto-detect</small></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="tcpipFlag"> Ativar <code>--tcpip</code></label><small>Sem valor: detecta IP do USB</small></div>
+      <div class="field"><label for="port">Porta <code>-p</code></label><input type="text" id="port" placeholder="27183:27199"><small>Default 27183:27199</small></div>
+    </div>
+  </section>
+
+  <section class="card" id="s-video">
+    <h2 data-i18n="s3">3. Vídeo e janela</h2>
+    <p class="hint">Dica: <code>--max-size 1024</code> melhora muito a performance.</p>
+    <div class="grid">
+      <div class="field"><label for="maxSize">Tamanho máx (px) <code>-m</code></label><input type="number" id="maxSize" min="0" placeholder="0 = sem limite"></div>
+      <div class="field"><label for="bitrate">Bit-rate <code>-b</code></label><input type="text" id="bitrate" placeholder="8M"></div>
+      <div class="field"><label for="maxFps">FPS máx <code>--max-fps</code></label><input type="number" id="maxFps" min="0" placeholder="ilimitado"></div>
+      <div class="field"><label for="codec">Codec <code>--video-codec</code></label><select id="codec"><option value="">padrão (h264)</option><option>h264</option><option>h265</option><option>av1</option></select></div>
+      <div class="field"><label for="encoder">Encoder <code>--video-encoder</code></label><input type="text" id="encoder" placeholder="auto"></div>
+      <div class="field"><label for="vsource">Fonte <code>--video-source</code></label><select id="vsource"><option value="display">display</option><option value="camera">camera (Android 12+)</option></select></div>
+      <div class="field"><label for="displayId">Display id <code>--display-id</code></label><input type="number" id="displayId" min="0" placeholder="0"></div>
+      <div class="field"><label for="capOrient">Captura <code>--capture-orientation</code></label><select id="capOrient"><option value="">0 (padrão)</option><option>0</option><option>90</option><option>180</option><option>270</option><option>@90 (travar)</option><option>@ (travar inicial)</option></select></div>
+      <div class="field"><label for="crop">Crop <code>--crop w:h:x:y</code></label><input type="text" id="crop" placeholder="1224:1440:0:0"></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="noVideo"> Sem vídeo <code>--no-video</code></label></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="fullscreen"> Fullscreen <code>-f</code></label></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="noWindow"> Sem janela <code>--no-window</code></label></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="onTop"> Sempre no topo <code>--always-on-top</code></label></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="borderless"> Sem bordas <code>--window-borderless</code></label></div>
+      <div class="field"><label for="winTitle">Título <code>--window-title</code></label><input type="text" id="winTitle" placeholder="Meu Celular"></div>
+      <div class="field"><label for="winW">Largura <code>--window-width</code></label><input type="number" id="winW" min="0" placeholder="auto"></div>
+      <div class="field"><label for="winH">Altura <code>--window-height</code></label><input type="number" id="winH" min="0" placeholder="auto"></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="screensaver"> Desligar screensaver <code>--disable-screensaver</code></label></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="printFps"> Mostrar FPS <code>--print-fps</code></label></div>
+    </div>
+  </section>
+
+  <section class="card" id="s-audio">
+    <h2 data-i18n="s4">4. Áudio</h2>
+    <p class="hint">Android 11+ para forwarding de áudio.</p>
+    <div class="grid">
+      <div class="field"><label class="checkrow"><input type="checkbox" id="noAudio"> Sem áudio <code>--no-audio</code></label></div>
+      <div class="field"><label for="acodec">Codec <code>--audio-codec</code></label><select id="acodec"><option value="">padrão (opus)</option><option>opus</option><option>aac</option><option>flac</option><option>raw</option></select></div>
+      <div class="field"><label for="abitrate">Bit-rate <code>--audio-bit-rate</code></label><input type="text" id="abitrate" placeholder="128K"></div>
+      <div class="field"><label for="asource">Fonte <code>--audio-source</code></label><select id="asource"><option value="">padrão (output)</option><option>output</option><option>playback</option><option>mic</option><option>mic-unprocessed</option><option>mic-camcorder</option><option>mic-voice-recognition</option><option>mic-voice-communication</option><option>voice-call</option><option>voice-call-uplink</option><option>voice-call-downlink</option><option>voice-performance</option></select></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="audioDup"> Duplicar no device <code>--audio-dup</code></label><small>Requer fonte = playback</small></div>
+      <div class="field"><label for="abuffer">Buffer (ms) <code>--audio-buffer</code></label><input type="number" id="abuffer" min="0" placeholder="50"></div>
+    </div>
+  </section>
+
+  <section class="card" id="s-input">
+    <h2 data-i18n="s5">5. Controle / input</h2>
+    <div class="grid">
+      <div class="field"><label class="checkrow"><input type="checkbox" id="noControl"> Somente leitura <code>-n</code></label></div>
+      <div class="field"><label for="keyboard">Teclado <code>--keyboard</code></label><select id="keyboard"><option value="">auto</option><option>disabled</option><option>sdk</option><option>uhid</option><option>aoa</option></select></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="flagK"> Teclado físico <code>-K</code></label><small>uhid (ou aoa com OTG)</small></div>
+      <div class="field"><label for="mouse">Mouse <code>--mouse</code></label><select id="mouse"><option value="">auto</option><option>disabled</option><option>sdk</option><option>uhid</option><option>aoa</option></select></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="flagM"> Mouse físico <code>-M</code></label></div>
+      <div class="field"><label for="gamepad">Gamepad <code>--gamepad</code></label><select id="gamepad"><option value="">disabled</option><option>disabled</option><option>uhid</option><option>aoa</option></select></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="flagG"> Gamepad <code>-G</code></label></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="preferText"> Preferir texto <code>--prefer-text</code></label><small>Só com keyboard=sdk</small></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="rawKeys"> Raw keys <code>--raw-key-events</code></label><small>Só com keyboard=sdk</small></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="noKeyRepeat"> Sem repetição <code>--no-key-repeat</code></label></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="legacyPaste"> Colar legado <code>--legacy-paste</code></label></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="noClipSync"> Sem sync clipboard <code>--no-clipboard-autosync</code></label></div>
+      <div class="field"><label for="shortcutMod">Mod atalhos <code>--shortcut-mod</code></label><input type="text" id="shortcutMod" placeholder="lalt,lsuper"></div>
+      <div class="field"><label for="pushTarget">Destino push <code>--push-target</code></label><input type="text" id="pushTarget" placeholder="/sdcard/Download/"></div>
+    </div>
+  </section>
+
+  <section class="card" id="s-rec">
+    <h2 data-i18n="s6">6. Gravação, câmera e display virtual</h2>
+    <div class="grid">
+      <div class="field"><label for="record">Gravar em <code>-r</code></label><input type="text" id="record" placeholder="video.mp4"></div>
+      <div class="field"><label for="recordFmt">Formato <code>--record-format</code></label><select id="recordFmt"><option value="">auto (pela extensão)</option><option>mp4</option><option>mkv</option><option>m4a</option><option>mka</option><option>opus</option><option>aac</option><option>flac</option><option>wav</option></select></div>
+      <div class="field"><label for="camFacing">Câmera <code>--camera-facing</code></label><select id="camFacing"><option value="">qualquer</option><option>front</option><option>back</option><option>external</option></select></div>
+      <div class="field"><label for="camSize">Tam. câmera <code>--camera-size</code></label><input type="text" id="camSize" placeholder="1920x1080"></div>
+      <div class="field"><label for="camFps">FPS câmera <code>--camera-fps</code></label><input type="number" id="camFps" min="0" placeholder="30"></div>
+      <div class="field"><label for="newDisplay">Novo display <code>--new-display</code></label><input type="text" id="newDisplay" placeholder="1920x1080/420"></div>
+      <div class="field"><label for="startApp">Iniciar app <code>--start-app</code></label><input type="text" id="startApp" placeholder="org.videolan.vlc"></div>
+    </div>
+    <details class="adv"><summary>Avançado: OTG / energia / v4</summary>
+      <div class="grid" style="margin-top:10px">
+        <div class="field"><label class="checkrow"><input type="checkbox" id="otg"> Modo OTG <code>--otg</code></label><small>USB, sem espelhamento</small></div>
+        <div class="field"><label class="checkrow"><input type="checkbox" id="stayAwake"> Manter ligado <code>-w</code></label></div>
+        <div class="field"><label class="checkrow"><input type="checkbox" id="screenOff"> Tela off <code>-S</code></label></div>
+        <div class="field"><label class="checkrow"><input type="checkbox" id="showTouches"> Mostrar toques <code>-t</code></label></div>
+        <div class="field"><label class="checkrow"><input type="checkbox" id="powerOff"> Power-off ao fechar <code>--power-off-on-close</code></label></div>
+        <div class="field"><label for="timeLimit">Limite (s) <code>--time-limit</code></label><input type="number" id="timeLimit" min="0" placeholder="0 = sem limite"></div>
+        <div class="field"><label class="checkrow"><input type="checkbox" id="flex"> Flex display <code>-x</code> (v4+)</label></div>
+        <div class="field"><label for="renderFit">Ajuste <code>--render-fit</code> (v4+)</label><select id="renderFit"><option value="">padrão</option><option>letterbox</option><option>stretched</option><option>unscaled</option></select></div>
+        <div class="field"><label class="checkrow"><input type="checkbox" id="keepActive"> Manter ativo <code>--keep-active</code> (v4+)</label></div>
+        <div class="field"><label for="bgColor">Fundo janela <code>--background-color</code> (v4+)</label><input type="text" id="bgColor" placeholder="#222"></div>
+        <div class="field"><label class="checkrow"><input type="checkbox" id="camTorch"> Flash <code>--camera-torch</code> (v4+)</label></div>
+      </div>
+    </details>
+  </section>
+
+  <section class="card" id="s-icon">
+    <h2 data-i18n="s7">7. Ícone do atalho</h2>
+    <p class="hint">Base: <code>scrcpy.svg</code> oficial. As cores são aplicadas no download pelo instalador.</p>
+    <div class="grid">
+      <div class="field"><label for="iconBg">Moldura (fundo)</label><input type="color" id="iconBg" value="#077063"></div>
+      <div class="field"><label for="iconFg">Corpo e antenas</label><input type="color" id="iconFg" value="#30dd81"></div>
+      <div class="field"><label for="iconScreen">Tela inferior</label><input type="color" id="iconScreen" value="#e4e4e4"></div>
+      <div class="field"><label for="iconEyes">Olhos / branco</label><input type="color" id="iconEyes" value="#ffffff"></div>
+    </div>
+    <div class="preview">
+      <svg id="iconPrev" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="prévia do ícone">
+        <rect x="4" y="5" width="40" height="28" rx="2" id="pvBg" fill="#077063"/>
+        <rect x="4" y="30" width="40" height="7" id="pvScreen" fill="#e4e4e4"/>
+        <ellipse cx="24" cy="27" rx="16" ry="6.5" id="pvFg" fill="#30dd81"/>
+        <line x1="15" y1="21" x2="11.5" y2="15.5" stroke="#30dd81" stroke-width="3" stroke-linecap="round" id="pvAnt1"/>
+        <line x1="33" y1="21" x2="36.5" y2="15.5" stroke="#30dd81" stroke-width="3" stroke-linecap="round" id="pvAnt2"/>
+        <circle cx="16" cy="26" r="2" id="pvEye1" fill="#ffffff"/>
+        <circle cx="32" cy="26" r="2" id="pvEye2" fill="#ffffff"/>
+        <path d="m14 12 h17 l3 16 -5 11 h-20 l-5 -11 z" fill="#cccccc" opacity="0.35"/>
+      </svg>
+      <div><strong id="deskName">Meu Celular</strong><br><small style="color:var(--muted)">~/.local/share/applications/<span id="slugPrev2">meu-celular</span>.desktop</small></div>
+    </div>
+  </section>
+
+  <section id="result">
+    <h2 data-i18n="s8">Comando pronto — copie e cole no terminal</h2>
+    <div id="warnings"></div>
+    <pre><code id="oneliner"></code></pre>
+    <div class="btnrow">
+      <button id="copyBtn" type="button">Copiar comando</button>
+      <button id="dlBtn" class="ghost" type="button">Baixar .sh</button>
+    </div>
+    <details class="adv"><summary>Prévia do .desktop gerado</summary><pre><code id="desktopPrev"></code></pre></details>
+  </section>
+</main>
+<footer>scrcpy-installer · scrcpy é Apache-2.0 © Genymobile · instalador MIT · <a href="https://github.com/zonaro/scrcpy-installer">repo</a></footer>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var BASE="https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/install.sh";
+var DEF={bg:"#077063",fg:"#30dd81",screen:"#e4e4e4",eyes:"#ffffff"};
+var I18N={
+ pt:{gen:"— gerador de comando",sub:"Configure o scrcpy pelo formulário. No final, um comando copiável instala o scrcpy do repositório oficial, adiciona ao PATH e cria um atalho .desktop com a sua configuração e ícone personalizado.",s1:"1. Atalho e versão",s1h:"O nome vira o título e o arquivo .desktop (ex.: “Meu Celular” → meu-celular.desktop).",s2:"2. Conexão",s3:"3. Vídeo e janela",s4:"4. Áudio",s5:"5. Controle / input",s6:"6. Gravação, câmera e display virtual",s7:"7. Ícone do atalho",s8:"Comando pronto — copie e cole no terminal"},
+ en:{gen:"— command generator",sub:"Configure scrcpy with the form. At the end, a copyable command installs scrcpy from the official repo, adds it to PATH and creates a .desktop shortcut with your settings and custom icon.",s1:"1. Shortcut & version",s1h:"The name becomes the .desktop title and file (e.g. “My Phone” → my-phone.desktop).",s2:"2. Connection",s3:"3. Video & window",s4:"4. Audio",s5:"5. Control / input",s6:"6. Recording, camera & virtual display",s7:"7. Shortcut icon",s8:"Ready command — copy & paste into a terminal"},
+ es:{gen:"— generador de comandos",sub:"Configure scrcpy con el formulario. Al final, un comando copiable instala scrcpy desde el repo oficial, lo añade al PATH y crea un acceso .desktop con su configuración e icono personalizado.",s1:"1. Acceso y versión",s1h:"El nombre será el título y el archivo .desktop (ej.: “Mi Teléfono” → mi-teléfono.desktop).",s2:"2. Conexión",s3:"3. Video y ventana",s4:"4. Audio",s5:"5. Control / entrada",s6:"6. Grabación, cámara y pantalla virtual",s7:"7. Icono del acceso",s8:"Comando listo — copie y pegue en la terminal"}
+};
+function autoLang(){var l=(navigator.language||"pt").slice(0,2);return I18N[l]?l:"pt";}
+function applyLang(l){var d=I18N[l]||I18N.pt;document.querySelectorAll("[data-i18n]").forEach(function(el){var k=el.getAttribute("data-i18n");if(d[k])el.textContent=d[k];});document.documentElement.lang=l==="pt"?"pt-BR":l;}
+function slugify(s){return (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[ _]+/g,"-").replace(/[^a-z0-9-]/g,"").replace(/-{2,}/g,"-").replace(/^-|-$/g,"")||"scrcpy";}
+function shSingle(s){return "'"+String(s).replace(/'/g,"'\\''")+"'";}
+function quoteArg(v){return /[^A-Za-z0-9_@%+=:,./-]/.test(v)?'"'+v.replace(/(["\\$`])/g,"\\$1")+'"':v;}
+function val(id){var el=$(id);return el?el.value.trim():"";}
+function checked(id){var el=$(id);return el?el.checked:false;}
+function buildArgs(){
+  var a=[];
+  if(checked("selUsb"))a.push("-d");
+  if(checked("selTcpip"))a.push("-e");
+  if(checked("tcpipFlag"))a.push(val("tcpip")?"--tcpip="+quoteArg(val("tcpip")):"--tcpip");
+  if(val("serial"))a.push("--serial="+quoteArg(val("serial")));
+  if(val("port"))a.push("--port="+quoteArg(val("port")));
+  if(val("maxSize")&&+val("maxSize")>0)a.push("--max-size="+val("maxSize"));
+  if(val("bitrate"))a.push("--video-bit-rate="+quoteArg(val("bitrate")));
+  if(val("maxFps")&&+val("maxFps")>0)a.push("--max-fps="+val("maxFps"));
+  if(val("codec"))a.push("--video-codec="+val("codec"));
+  if(val("encoder"))a.push("--video-encoder="+quoteArg(val("encoder")));
+  if(val("vsource")&&val("vsource")!=="display")a.push("--video-source="+val("vsource"));
+  if(val("displayId")&&+val("displayId")>0)a.push("--display-id="+val("displayId"));
+  if(val("capOrient"))a.push("--capture-orientation="+quoteArg(val("capOrient")));
+  if(val("crop"))a.push("--crop="+quoteArg(val("crop")));
+  if(checked("noVideo"))a.push("--no-video");
+  if(checked("fullscreen"))a.push("--fullscreen");
+  if(checked("noWindow"))a.push("--no-window");
+  if(checked("onTop"))a.push("--always-on-top");
+  if(checked("borderless"))a.push("--window-borderless");
+  if(val("winTitle"))a.push("--window-title="+quoteArg(val("winTitle")));
+  if(val("winW")&&+val("winW")>0)a.push("--window-width="+val("winW"));
+  if(val("winH")&&+val("winH")>0)a.push("--window-height="+val("winH"));
+  if(checked("screensaver"))a.push("--disable-screensaver");
+  if(checked("printFps"))a.push("--print-fps");
+  if(checked("noAudio"))a.push("--no-audio");
+  if(val("acodec"))a.push("--audio-codec="+val("acodec"));
+  if(val("abitrate"))a.push("--audio-bit-rate="+quoteArg(val("abitrate")));
+  if(val("asource"))a.push("--audio-source="+val("asource"));
+  if(checked("audioDup"))a.push("--audio-dup");
+  if(val("abuffer")&&+val("abuffer")>0)a.push("--audio-buffer="+val("abuffer"));
+  if(checked("noControl"))a.push("--no-control");
+  if(val("keyboard"))a.push("--keyboard="+val("keyboard"));
+  if(checked("flagK"))a.push("--keyboard=uhid");
+  if(val("mouse"))a.push("--mouse="+val("mouse"));
+  if(checked("flagM"))a.push("--mouse=uhid");
+  if(val("gamepad")&&val("gamepad")!=="disabled")a.push("--gamepad="+val("gamepad"));
+  if(checked("flagG"))a.push("--gamepad=uhid");
+  if(checked("preferText"))a.push("--prefer-text");
+  if(checked("rawKeys"))a.push("--raw-key-events");
+  if(checked("noKeyRepeat"))a.push("--no-key-repeat");
+  if(checked("legacyPaste"))a.push("--legacy-paste");
+  if(checked("noClipSync"))a.push("--no-clipboard-autosync");
+  if(val("shortcutMod"))a.push("--shortcut-mod="+quoteArg(val("shortcutMod")));
+  if(val("pushTarget"))a.push("--push-target="+quoteArg(val("pushTarget")));
+  if(val("record"))a.push("--record="+quoteArg(val("record")));
+  if(val("recordFmt"))a.push("--record-format="+val("recordFmt"));
+  if(val("camFacing"))a.push("--video-source=camera --camera-facing="+val("camFacing"));
+  else if(val("camSize")||val("camFps"))a.push("--video-source=camera");
+  if(val("camSize"))a.push("--camera-size="+quoteArg(val("camSize")));
+  if(val("camFps")&&+val("camFps")>0)a.push("--camera-fps="+val("camFps"));
+  if(val("newDisplay"))a.push("--new-display="+quoteArg(val("newDisplay")));
+  if(val("startApp"))a.push("--start-app="+quoteArg(val("startApp")));
+  if(checked("otg"))a.push("--otg");
+  if(checked("stayAwake"))a.push("--stay-awake");
+  if(checked("screenOff"))a.push("--turn-screen-off");
+  if(checked("showTouches"))a.push("--show-touches");
+  if(checked("powerOff"))a.push("--power-off-on-close");
+  if(val("timeLimit")&&+val("timeLimit")>0)a.push("--time-limit="+val("timeLimit"));
+  if(checked("flex"))a.push("--flex-display");
+  if(val("renderFit"))a.push("--render-fit="+val("renderFit"));
+  if(checked("keepActive"))a.push("--keep-active");
+  if(val("bgColor"))a.push("--background-color="+quoteArg(val("bgColor")));
+  if(checked("camTorch"))a.push("--camera-torch");
+  return a.join(" ");
+}
+function validate(){
+  var w=[];
+  if(checked("preferText")&&checked("rawKeys"))w.push(["err","--prefer-text e --raw-key-events são mutuamente exclusivos."]);
+  if((checked("preferText")||checked("rawKeys"))&&val("keyboard")!=="sdk")w.push(["warn","--prefer-text/--raw-key-events exigem --keyboard=sdk."]);
+  if(val("mouse")==="sdk"&&checked("noVideo"))w.push(["warn","--mouse=sdk requer playback de vídeo (desmarque --no-video ou use uhid)."]);
+  if(checked("audioDup")&&val("asource")!=="playback")w.push(["err","--audio-dup exige --audio-source=playback."]);
+  if((val("camSize")||val("camFps")||val("camFacing"))&&val("vsource")!=="camera"&&!val("camFacing"))w.push(["warn","Opções de câmera exigem fonte = camera (aplicado automaticamente)."]);
+  if(checked("flex")||val("renderFit")||checked("keepActive")||val("bgColor")||checked("camTorch"))w.push(["warn","Flags marcadas (v4+) exigem scrcpy v4 ou superior."]);
+  if(checked("otg")&&val("vsource")==="camera")w.push(["warn","--otg desabilita espelhamento; conflita com fonte camera."]);
+  return w;
+}
+function update(){
+  var name=val("shortcutName")||"Meu Celular";
+  var slug=slugify(name);
+  $("slugPrev").textContent=slug;$("slugPrev2").textContent=slug;$("deskName").textContent=name;
+  var scrcpyArgs=buildArgs();
+  var parts=["curl -fsSL "+BASE+" | bash -s --"];
+  var ver=$("scrVersion").value;
+  if(ver==="custom"&&val("customVer"))parts.push("--version "+shSingle(val("customVer")));
+  else if(ver!=="latest")parts.push("--version "+shSingle(ver));
+  parts.push("--shortcut-name "+shSingle(name));
+  if(scrcpyArgs)parts.push("--scrcpy-args "+shSingle(scrcpyArgs));
+  var bg=$("iconBg").value,fg=$("iconFg").value,sc=$("iconScreen").value,ey=$("iconEyes").value;
+  if(bg.toLowerCase()!==DEF.bg)parts.push("--icon-bg "+shSingle(bg));
+  if(fg.toLowerCase()!==DEF.fg)parts.push("--icon-fg "+shSingle(fg));
+  if(sc.toLowerCase()!==DEF.screen)parts.push("--icon-screen "+shSingle(sc));
+  if(ey.toLowerCase()!==DEF.eyes)parts.push("--icon-eyes "+shSingle(ey));
+  var cmd=parts.join(" ");
+  $("oneliner").textContent=cmd;
+  var bin="~/.local/bin/scrcpy";
+  $("desktopPrev").textContent="[Desktop Entry]\nName="+name+"\nComment=scrcpy "+scrcpyArgs+"\nExec="+bin+(scrcpyArgs?" "+scrcpyArgs:"")+"\nIcon=~/.local/share/icons/"+slug+".svg\nTerminal=false\nType=Application\nCategories=Utility;Video;\nStartupWMClass=scrcpy";
+  var ws=validate();
+  $("warnings").innerHTML=ws.map(function(x){return '<div class="'+x[0]+'">⚠ '+x[1]+'</div>';}).join("");
+  $("pvBg").setAttribute("fill",bg);$("pvFg").setAttribute("fill",fg);
+  $("pvAnt1").setAttribute("stroke",fg);$("pvAnt2").setAttribute("stroke",fg);
+  $("pvScreen").setAttribute("fill",sc);
+  $("pvEye1").setAttribute("fill",ey);$("pvEye2").setAttribute("fill",ey);
+  try{var q={};document.querySelectorAll("input,select").forEach(function(el){if(el.id)q[el.id]=el.type==="checkbox"?el.checked:el.value;});history.replaceState(null,"","#"+btoa(unescape(encodeURIComponent(JSON.stringify(q)))).slice(0,2000));}catch(e){}
+}
+function restore(){
+  try{
+    if(!location.hash)return;
+    var q=JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1)))));
+    Object.keys(q).forEach(function(id){var el=$(id);if(!el)return;if(el.type==="checkbox")el.checked=!!q[id];else el.value=q[id];});
+  }catch(e){}
+}
+document.addEventListener("input",function(e){
+  if(e.target&&e.target.id==="scrVersion")$("customVerWrap").hidden=$("scrVersion").value!=="custom";
+  update();
+});
+document.addEventListener("change",function(){$("customVerWrap").hidden=$("scrVersion").value!=="custom";update();});
+$("copyBtn").addEventListener("click",function(){
+  var t=$("oneliner").textContent;
+  function ok(){var b=$("copyBtn");b.textContent="Copiado!";setTimeout(function(){b.textContent="Copiar comando";},1500);}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,fallback);
+  else fallback();
+  function fallback(){var ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");ok();}catch(e){}document.body.removeChild(ta);}
+});
+$("dlBtn").addEventListener("click",function(){
+  var blob=new Blob(["#!/usr/bin/env bash\n"+$("oneliner").textContent.replace(/^curl.*\|\s*bash -s --\s*/,"bash install.sh ")+"\n"],{type:"text/x-sh"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="scrcpy-setup.sh";a.click();setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
+});
+$("lang").addEventListener("change",function(){applyLang($("lang").value);});
+(function init(){var l=autoLang();$("lang").value=l;applyLang(l);restore();$("customVerWrap").hidden=$("scrVersion").value!=="custom";update();})();
+})();
+</script>
+</body>
+</html>

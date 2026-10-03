@@ -12,6 +12,7 @@
 #
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/install.sh | bash -s -- --shortcut-name "Meu Celular" --scrcpy-args "--max-size 1024 --no-audio"
 #
 # Options:
 #   --version <tag>   Install a specific release tag (default: latest)
@@ -21,6 +22,14 @@
 #   --no-deps         Skip automatic dependency installation
 #   --no-checksum     Skip SHA256 verification of the downloaded archive
 #   --uninstall       Remove the scrcpy installed by this script
+#   --shortcut-name <name>  Create a .desktop shortcut with this name (uses --scrcpy-args as Exec args)
+#   --scrcpy-args "<args>"  Arguments baked into the shortcut's Exec= line (default: "")
+#   --icon-bg <hex>   Recolor SVG background frame (default: #077063)
+#   --icon-fg <hex>   Recolor SVG body/antennas (default: #30dd81)
+#   --icon-screen <hex>  Recolor SVG lower screen (default: #e4e4e4)
+#   --icon-eyes <hex> Recolor SVG eyes/white parts (default: #ffffff)
+#   --icon-url <url>  Custom SVG icon source (default: official scrcpy.svg)
+#   --shortcut-only   Only create the shortcut, skip (re)installation (requires --shortcut-name)
 #   --help            Show this help
 #
 
@@ -49,6 +58,14 @@ FORCE=0
 NO_DEPS=0
 NO_CHECKSUM=0
 UNINSTALL=0
+SHORTCUT_NAME=""
+SCRCPY_ARGS=""
+ICON_BG="#077063"
+ICON_FG="#30dd81"
+ICON_SCREEN="#e4e4e4"
+ICON_EYES="#ffffff"
+ICON_URL="https://github.com/Genymobile/scrcpy/raw/master/app/data/scrcpy.svg"
+SHORTCUT_ONLY=0
 
 TMP_DIR=""
 cleanup() {
@@ -119,9 +136,78 @@ download() { # download <url> <output-file>
     fi
 }
 
+sanitize_slug() { # sanitize_slug <name> -> safe filename slug
+    printf '%s' "$1" \
+        | tr '[:upper:]' '[:lower:]' \
+        | sed -e 's/[ _]/-/g' -e 's/[^a-z0-9-]//g' -e 's/-\{2,\}/-/g' -e 's/^-//' -e 's/-$//'
+}
+
+create_shortcut() { # uses SHORTCUT_NAME, SCRCPY_ARGS, ICON_* globals
+    local name="$SHORTCUT_NAME"
+    [ -n "$name" ] || die "--shortcut-name requires a non-empty argument"
+    local slug
+    slug="$(sanitize_slug "$name")"
+    [ -n "$slug" ] || slug="scrcpy"
+
+    local bin
+    if [ -x "$BIN_DIR/scrcpy" ]; then bin="$BIN_DIR/scrcpy"
+    elif command -v scrcpy >/dev/null 2>&1; then bin="$(command -v scrcpy)"
+    else bin="scrcpy"; fi
+
+    local app_dir icon_dir
+    if [ "$PREFIX" = "/usr/local" ] || [ "$(id -u)" -eq 0 ]; then
+        app_dir="/usr/local/share/applications"
+        icon_dir="/usr/local/share/icons"
+    else
+        app_dir="$HOME/.local/share/applications"
+        icon_dir="$HOME/.local/share/icons"
+    fi
+    run_priv install -d "$app_dir" "$icon_dir"
+
+    local icon_file="$icon_dir/$slug.svg"
+    local desk_file="$app_dir/$slug.desktop"
+
+    info "creating icon $icon_file ..."
+    if download "$ICON_URL" "$TMP_DIR/icon.svg"; then
+        sed -e "s/#077063/${ICON_BG}/gI" \
+            -e "s/#30dd81/${ICON_FG}/gI" \
+            -e "s/#e4e4e4/${ICON_SCREEN}/gI" \
+            -e "s/#ffffff/${ICON_EYES}/gI" \
+            "$TMP_DIR/icon.svg" > "$TMP_DIR/icon-out.svg"
+        run_priv install -m 644 "$TMP_DIR/icon-out.svg" "$icon_file"
+    else
+        warn "could not download icon from $ICON_URL; shortcut will use a generic icon"
+        icon_file="video-display"
+    fi
+
+    local exec_line="$bin"
+    [ -n "$SCRCPY_ARGS" ] && exec_line="$exec_line $SCRCPY_ARGS"
+
+    info "creating shortcut $desk_file ..."
+    {
+        printf '[Desktop Entry]\n'
+        printf 'Name=%s\n' "$name"
+        printf 'Comment=scrcpy %s\n' "$SCRCPY_ARGS"
+        printf 'Exec=%s\n' "$exec_line"
+        printf 'Icon=%s\n' "$icon_file"
+        printf 'Terminal=false\n'
+        printf 'Type=Application\n'
+        printf 'Categories=Utility;Video;\n'
+        printf 'StartupWMClass=scrcpy\n'
+        printf 'Keywords=scrcpy;android;mirror;\n'
+    } > "$TMP_DIR/$slug.desktop"
+    run_priv install -m 644 "$TMP_DIR/$slug.desktop" "$desk_file"
+    run_priv chmod +x "$desk_file" 2>/dev/null || true
+
+    if command -v update-desktop-database >/dev/null 2>&1; then
+        run_priv update-desktop-database -q "$app_dir" 2>/dev/null || true
+    fi
+    info "shortcut '$name' ready ($desk_file)"
+}
+
 # ---------------------------------------------------------------- usage
 usage() {
-    sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '1,/^[^#]/p' "$0" | sed 's/^# \{0,1\}//' | sed '1d;$d'
     exit 0
 }
 
@@ -135,6 +221,14 @@ while [ $# -gt 0 ]; do
         --no-deps)    NO_DEPS=1; shift ;;
         --no-checksum) NO_CHECKSUM=1; shift ;;
         --uninstall)  UNINSTALL=1; shift ;;
+        --shortcut-name) SHORTCUT_NAME="${2:?--shortcut-name requires an argument}"; shift 2 ;;
+        --scrcpy-args)  SCRCPY_ARGS="${2:?--scrcpy-args requires an argument}"; shift 2 ;;
+        --icon-bg)    ICON_BG="${2:?--icon-bg requires an argument}"; shift 2 ;;
+        --icon-fg)    ICON_FG="${2:?--icon-fg requires an argument}"; shift 2 ;;
+        --icon-screen) ICON_SCREEN="${2:?--icon-screen requires an argument}"; shift 2 ;;
+        --icon-eyes)  ICON_EYES="${2:?--icon-eyes requires an argument}"; shift 2 ;;
+        --icon-url)   ICON_URL="${2:?--icon-url requires an argument}"; shift 2 ;;
+        --shortcut-only) SHORTCUT_ONLY=1; shift ;;
         --help|-h)    usage ;;
         *) die "unknown option: $1 (see --help)" ;;
     esac
@@ -151,8 +245,19 @@ MAN_DIR="$PREFIX/share/man/man1"
 
 # ---------------------------------------------------------------- uninstall
 if [ "$UNINSTALL" -eq 1 ]; then
+    if [ -n "$SHORTCUT_NAME" ]; then
+        slug="$(sanitize_slug "$SHORTCUT_NAME")"
+        [ -n "$slug" ] || slug="scrcpy"
+        for d in "$HOME/.local/share/applications" "/usr/local/share/applications"; do
+            [ -f "$d/$slug.desktop" ] && run_priv rm -f "$d/$slug.desktop" && info "removed shortcut $d/$slug.desktop"
+        done
+        for d in "$HOME/.local/share/icons" "/usr/local/share/icons"; do
+            [ -f "$d/$slug.svg" ] && run_priv rm -f "$d/$slug.svg" && info "removed icon $d/$slug.svg"
+        done
+    fi
     if [ ! -d "$LIB_DIR" ] && [ ! -L "$BIN_DIR/scrcpy" ]; then
         warn "nothing installed by this script at $PREFIX"
+        [ -n "$SHORTCUT_NAME" ] && exit 0
         exit 0
     fi
     run_priv rm -f  "$BIN_DIR/scrcpy"
@@ -161,6 +266,14 @@ if [ "$UNINSTALL" -eq 1 ]; then
     run_priv rm -rf "$LIB_DIR"
     info "scrcpy uninstalled from $PREFIX"
     info "note: PATH entries added to your shell profiles were left untouched"
+    exit 0
+fi
+
+# ---------------------------------------------------------------- shortcut-only (no install)
+if [ "$SHORTCUT_ONLY" -eq 1 ]; then
+    [ -n "$SHORTCUT_NAME" ] || die "--shortcut-only requires --shortcut-name <name>"
+    TMP_DIR="$(mktemp -d)"
+    create_shortcut
     exit 0
 fi
 
@@ -301,4 +414,9 @@ if [ -x "$BIN_DIR/scrcpy" ]; then
     [ "$NO_DEPS" -eq 1 ] && warn "dependencies were skipped (--no-deps): make sure adb and libudev are available"
 else
     die "installation failed: $BIN_DIR/scrcpy is missing"
+fi
+
+# ---------------------------------------------------------------- optional shortcut
+if [ -n "$SHORTCUT_NAME" ]; then
+    create_shortcut
 fi
