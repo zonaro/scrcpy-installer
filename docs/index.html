@@ -49,7 +49,7 @@ header.hero .links a{color:var(--accent);margin:0 10px;text-decoration:none}
 header.hero .links a:hover{text-decoration:underline}
 .langbar{margin-top:14px}
 .langbar select{background:var(--panel);color:var(--fg);border:1px solid var(--border);border-radius:8px;padding:6px 10px}
-main{max-width:1080px;margin:0 auto;padding:20px;display:grid;gap:16px}
+main{max-width:1200px;margin:0 auto;padding:20px;display:grid;gap:16px}
 section.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
 section.card h2{margin:0 0 4px;font-size:1.15rem}
 section.card p.hint{margin:0 0 12px;color:var(--muted);font-size:.9rem}
@@ -64,8 +64,14 @@ section.card p.hint{margin:0 0 12px;color:var(--muted);font-size:.9rem}
 .checkrow input{width:18px;height:18px;accent-color:var(--accent)}
 details.adv{margin-top:10px}
 details.adv summary{cursor:pointer;color:var(--accent)}
-#result{position:sticky;bottom:0;background:#0b0e13;border:1px solid var(--accent2);border-radius:var(--radius);padding:16px 18px}
-#result h2{margin-top:0}
+#result{position:sticky;background:#0b0e13;border:1px solid var(--accent2);border-radius:var(--radius);padding:16px 18px}
+.result-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.result-head h2{margin:0;font-size:1.05rem;flex:1;min-width:0}
+#resultToggle{flex:0 0 auto;background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:8px;padding:6px 12px;font-weight:700;cursor:pointer;font-size:.85rem;white-space:nowrap}
+#resultToggle:hover{background:rgba(48,221,129,.12)}
+#resultBody{display:block}
+#result.collapsed #resultBody{display:none}
+#result.collapsed{padding:10px 14px}
 pre{background:#000;border:1px solid var(--border);border-radius:8px;padding:12px;overflow-x:auto;font-size:.85rem;white-space:pre-wrap;word-break:break-all}
 pre code{color:#a5f3c0}
 .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
@@ -79,8 +85,13 @@ button:hover{filter:brightness(1.1)}
 footer{text-align:center;color:var(--muted);padding:24px;font-size:.85rem}
 footer a{color:var(--accent)}
 @media(max-width:640px){.preview{grid-template-columns:1fr}header.hero h1{font-size:1.5rem}}
+@media(max-width:1099.98px){
+  main{grid-template-columns:minmax(0,1fr)}
+  #result{order:-1;position:sticky;top:0;bottom:auto;z-index:60;box-shadow:0 8px 24px rgba(0,0,0,.45);max-height:46vh;overflow-y:auto}
+  #result.collapsed{max-height:none;overflow:visible}
+}
 @media(min-width:1100px){
-  main{max-width:none;padding:20px 32px;grid-template-columns:minmax(0,1fr) 430px;align-items:start}
+  main{max-width:none;padding:20px 32px;grid-template-columns:minmax(0,2fr) minmax(0,1fr);align-items:start}
   main>section:not(#result){grid-column:1;min-width:0}
   #result{grid-column:2;grid-row:1/-1;align-self:start;position:sticky;top:16px;bottom:auto;max-height:calc(100vh - 32px);overflow-y:auto}
 }
@@ -248,7 +259,11 @@ footer a{color:var(--accent)}
   </section>
 
   <section id="result">
-    <h2 data-i18n="s8">Comando pronto — copie e cole no terminal</h2>
+    <div class="result-head">
+      <h2 data-i18n="s8">Comando pronto — copie e cole no terminal</h2>
+      <button id="resultToggle" type="button" aria-expanded="true" aria-controls="resultBody" title="Minimizar / expandir">—</button>
+    </div>
+    <div id="resultBody">
     <div id="warnings"></div>
     <pre><code id="oneliner"></code></pre>
     <div class="btnrow">
@@ -259,7 +274,9 @@ footer a{color:var(--accent)}
     </div>
     <p class="hint" style="color:var(--muted);font-size:.85rem" data-i18n="h_dl">O oneliner instala o scrcpy e cria o atalho. O .desktop é só o atalho (para quem já tem o scrcpy instalado) — salve em ~/.local/share/applications/.</p>
     <details class="adv"><summary data-i18n="sum_desktop">Prévia do .desktop gerado</summary><pre><code id="desktopPrev"></code></pre></details>
-    <section class="card" id="s-api">
+    </div>
+  </section>
+  <section class="card" id="s-api">
     <h2 data-i18n="s_api">Integração: query string, upload e arquivos</h2>
     <p data-i18n="p_api1">Qualquer parâmetro do scrcpy pode vir na query string com o nome da flag longa (sem --): booleanos como ?no-audio ou ?fullscreen, valores como ?max-size=1024&amp;video-codec=h265. Extras: shortcut-name, version (latest|v4.1|v3.3.4|outra tag), K|M|G (atalhos físicos) e icon-bg|icon-fg|icon-screen|icon-eyes (hex). Exemplo: ?shortcut-name=TV&amp;max-size=1024&amp;no-audio&amp;video-codec=h265. A query tem prioridade sobre o #hash salvo.</p>
     <p data-i18n="p_api2">Upload de .desktop: o formulário lê Name= e Exec= de um atalho existente (flags longas com = ou espaço e atalhos -d -e -m -b -f -n -K -M -G -w -S -t -x -s -p -r), preenche os campos e avisa o que foi ignorado. Cores do ícone não são recuperadas do SVG.</p>
@@ -602,6 +619,23 @@ $("desktopFile").addEventListener("change",function(){
   r.readAsText(f);
 });
 $("lang").addEventListener("change",function(){applyLang($("lang").value);});
+(function setupResultToggle(){
+  var sec=$("result"),btn=$("resultToggle");
+  if(!sec||!btn)return;
+  function label(){return sec.classList.contains("collapsed")?"+":"—";}
+  function apply(collapsed){
+    sec.classList.toggle("collapsed",!!collapsed);
+    btn.setAttribute("aria-expanded",collapsed?"false":"true");
+    btn.textContent=label();
+    btn.title=collapsed?"Expandir":"Minimizar";
+  }
+  btn.addEventListener("click",function(){apply(!sec.classList.contains("collapsed"));});
+  try{
+    if(window.innerWidth<700)apply(true);
+  }catch(e){}
+  sec._expand=function(){apply(false);};
+  $("copyBtn").addEventListener("click",function(){if(sec.classList.contains("collapsed")&&window.innerWidth<1100)apply(false);});
+})();
 (function init(){var l=autoLang();$("lang").value=l;applyLang(l);restore();applyQuery();$("customVerWrap").hidden=$("scrVersion").value!=="custom";update();})();
 })();
 </script>
