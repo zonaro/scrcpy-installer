@@ -58,7 +58,7 @@ section.card p.hint{margin:0 0 12px;color:var(--muted);font-size:.9rem}
 .field label{font-weight:600;font-size:.9rem}
 .field label code{color:var(--accent);font-weight:400;font-size:.8rem}
 .field small{color:var(--muted);font-size:.78rem}
-.field input[type=text],.field input[type=number],.field select{background:#0d1117;color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:7px 9px;width:100%}
+.field input[type=text],.field input[type=number],.field input[type=file],.field select{background:#0d1117;color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:7px 9px;width:100%}
 .field input[type=color]{width:100%;height:38px;border:1px solid var(--border);border-radius:6px;background:#0d1117;padding:2px}
 .checkrow{display:flex;align-items:center;gap:8px}
 .checkrow input{width:18px;height:18px;accent-color:var(--accent)}
@@ -106,7 +106,10 @@ footer a{color:var(--accent)}
       <div class="field"><label for="scrVersion"><span data-i18n="f_ver">Versão do scrcpy</span> <code>--version</code></label>
         <select id="scrVersion"><option value="latest" data-i18n="o_latest">latest (padrão)</option><option value="v4.1">v4.1</option><option value="v3.3.4">v3.3.4</option><option value="custom" data-i18n="o_custom">custom…</option></select></div>
       <div class="field" id="customVerWrap" hidden><label for="customVer"><span data-i18n="f_tag">Tag custom</span></label><input type="text" id="customVer" placeholder="v3.3.4"></div>
+      <div class="field"><label for="desktopFile"><span data-i18n="f_upload">Editar .desktop existente</span></label><input type="file" id="desktopFile" accept=".desktop,text/plain"><small data-i18n="h_upload">Upload preenche o formulário (Name + Exec).</small></div>
     </div>
+    <p class="hint" style="margin-top:10px" data-i18n="h_qs">Dica: dá para pré-preencher pela URL, ex. ?max-size=1024&amp;no-audio&amp;shortcut-name=TV — veja “Integração”.</p>
+    <div id="uploadNote" style="font-size:.9rem"></div>
   </section>
 
   <section class="card" id="s-conn">
@@ -219,15 +222,21 @@ footer a{color:var(--accent)}
       <div class="field"><label for="iconEyes"><span data-i18n="f_iconeyes">Olhos / branco</span></label><input type="color" id="iconEyes" value="#ffffff"></div>
     </div>
     <div class="preview">
-      <svg id="iconPrev" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="prévia do ícone">
-        <rect x="4" y="5" width="40" height="28" rx="2" id="pvBg" fill="#077063"/>
-        <rect x="4" y="30" width="40" height="7" id="pvScreen" fill="#e4e4e4"/>
-        <ellipse cx="24" cy="27" rx="16" ry="6.5" id="pvFg" fill="#30dd81"/>
-        <line x1="15" y1="21" x2="11.5" y2="15.5" stroke="#30dd81" stroke-width="3" stroke-linecap="round" id="pvAnt1"/>
-        <line x1="33" y1="21" x2="36.5" y2="15.5" stroke="#30dd81" stroke-width="3" stroke-linecap="round" id="pvAnt2"/>
-        <circle cx="16" cy="26" r="2" id="pvEye1" fill="#ffffff"/>
-        <circle cx="32" cy="26" r="2" id="pvEye2" fill="#ffffff"/>
-        <path d="m14 12 h17 l3 16 -5 11 h-20 l-5 -11 z" fill="#cccccc" opacity="0.35"/>
+      <svg id="iconPrev" viewBox="0 0 48 48" width="110" height="110" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="prévia do ícone">
+        <path style="opacity:0.2" d="m 16.846877,12 c -1.116351,0 -2.227419,0.912229 -2.015075,2 l 3.122973,16 -5.596557,11.109375 C 11.959876,41.871734 11.885244,42.336988 12.177176,43 c 0.278672,0.632897 0.998812,1 1.747448,1 H 24 34.075375 c 0.748637,0 1.468777,-0.367103 1.747448,-1 0.291932,-0.663012 0.217302,-1.128266 -0.181041,-1.890625 L 30.045225,30 33.168198,14 c 0.212344,-1.087771 -0.898724,-2 -2.015075,-2 H 24 Z"/>
+        <path style="fill:#cccccc" d="m 16.846877,11 c -1.116351,0 -2.227419,0.912229 -2.015075,2 l 3.122973,16 -5.596557,11.109375 C 11.959876,40.871734 11.885244,41.336988 12.177176,42 c 0.278672,0.632897 0.998812,1 1.747448,1 H 24 34.075375 c 0.748637,0 1.468777,-0.367103 1.747448,-1 0.291932,-0.663012 0.217302,-1.128266 -0.181041,-1.890625 L 30.045225,29 33.168198,13 c 0.212344,-1.087771 -0.898724,-2 -2.015075,-2 H 24 Z"/>
+        <rect style="opacity:0.2" width="40" height="32" x="4" y="6" rx="2" ry="2"/>
+        <path fill="#e4e4e4" id="pvScreen" d="m 4,33 v 2 c 0,1.108 0.892,2 2,2 h 36 c 1.108,0 2,-0.892 2,-2 v -2 z"/>
+        <path style="opacity:0.1" d="m 11.494141,15 a 1.5,1.5 0 0 0 -0.832032,0.255859 1.5,1.5 0 0 0 -0.40625,2.082032 l 3.13086,4.654297 C 10.404945,24.606192 8.4012371,28.299159 8.0019531,32.460938 7.9284599,34.000879 9.5546875,34 9.5546875,34 H 38.40625 c 0,0 1.672856,-3.38e-4 1.591797,-1.617188 -0.416529,-4.131451 -2.415618,-7.796833 -5.380859,-10.394531 l 3.126953,-4.65039 a 1.5,1.5 0 0 0 -0.40625,-2.082032 1.5,1.5 0 0 0 -1.125,-0.228515 1.5,1.5 0 0 0 -0.957032,0.634765 l -3.072265,4.566407 C 29.78649,18.814887 26.990024,18 24.001953,18 c -2.989385,0 -5.786177,0.815488 -8.183594,2.230469 l -3.074218,-4.56836 A 1.5,1.5 0 0 0 11.787109,15.027344 1.5,1.5 0 0 0 11.494141,15 Z"/>
+        <path fill="#077063" id="pvBg" d="M 6,5 C 4.892,5 4,5.892 4,7 V 33 H 44 V 7 C 44,5.892 43.108,5 42,5 Z"/>
+        <path style="opacity:0.1;fill:#ffffff" d="M 6,5 C 4.892,5 4,5.892 4,7 V 8 C 4,6.892 4.892,6 6,6 h 36 c 1.108,0 2,0.892 2,2 V 7 C 44,5.892 43.108,5 42,5 Z"/>
+        <path fill="none" stroke="#30dd81" stroke-width="3" stroke-linecap="round" id="pvAnt1" d="M 15.1998,21.000026 11.5,15.5"/>
+        <path fill="none" stroke="#30dd81" stroke-width="3" stroke-linecap="round" id="pvAnt2" d="M 32.799764,21.000026 36.5,15.5"/>
+        <path fill="#30dd81" id="pvFg" d="m 24.002386,17.000034 c -8.355868,0 -15.2214979,6.346843 -15.9999669,14.460906 C 7.9289259,33.000882 9.5544999,33 9.5544999,33 H 38.406003 c 0,0 1.672201,-3.35e-4 1.591142,-1.617185 C 39.182807,23.305596 32.331836,17.000034 24.002386,17.000034 Z"/>
+        <path style="opacity:0.2" d="m 16,25 a 1.9999959,1.9999959 0 0 0 -2,2 1.9999959,1.9999959 0 0 0 2,2 1.9999959,1.9999959 0 0 0 2,-2 1.9999959,1.9999959 0 0 0 -2,-2 z m 16,0 a 1.9999959,1.9999959 0 0 0 -2,2 1.9999959,1.9999959 0 0 0 2,-2 1.9999959,1.9999959 0 0 0 -2,-2 z"/>
+        <path fill="#ffffff" id="pvEye1" d="M 15.999996,24.000008 A 1.9999959,1.9999959 0 0 1 17.999992,26.000004 1.9999959,1.9999959 0 0 1 15.999996,28 1.9999959,1.9999959 0 0 1 14,26.000004 1.9999959,1.9999959 0 0 1 15.999996,24.000008 Z"/>
+        <path fill="#ffffff" id="pvEye2" d="M 31.999996,24.000008 A 1.9999959,1.9999959 0 0 1 33.999991,26.000004 1.9999959,1.9999959 0 0 1 31.999996,28 1.9999959,1.9999959 0 0 1 30,26.000004 1.9999959,1.9999959 0 0 1 31.999996,24.000008 Z"/>
+        <path style="fill:#ffffff;opacity:0.2" d="M 11.494141 14 A 1.5 1.5 0 0 0 10.662109 14.255859 A 1.5 1.5 0 0 0 10.115234 16.001953 A 1.5 1.5 0 0 1 10.662109 15.255859 A 1.5 1.5 0 0 1 11.494141 15 A 1.5 1.5 0 0 1 11.787109 15.027344 A 1.5 1.5 0 0 1 12.744141 15.662109 L 15.818359 20.230469 C 18.215776 18.815488 21.012568 18 24.001953 18 C 26.990024 18 29.78649 18.814887 32.183594 20.228516 L 35.255859 15.662109 A 1.5 1.5 0 0 1 36.212891 15.027344 A 1.5 1.5 0 0 1 37.337891 15.255859 A 1.5 1.5 0 0 1 37.910156 16.001953 A 1.5 1.5 0 0 0 37.337891 14.255859 A 1.5 1.5 0 0 0 36.212891 14.027344 A 1.5 1.5 0 0 0 35.255859 14.662109 L 32.183594 19.228516 C 29.78649 17.814887 26.990024 17 24.001953 17 C 21.012568 17 18.215776 17.815488 15.818359 19.230469 L 12.744141 14.662109 A 1.5 1.5 0 0 0 11.787109 14.027344 A 1.5 1.5 0 0 0 11.494141 14 z M 35.033203 21.369141 L 34.617188 21.988281 C 37.477056 24.493668 39.433905 27.993356 39.943359 31.945312 C 39.986866 31.783283 40.008864 31.598575 39.998047 31.382812 C 39.601372 27.448291 37.768055 23.938648 35.033203 21.369141 z M 12.970703 21.373047 C 10.220358 23.959215 8.3822757 27.496796 8.0019531 31.460938 C 7.9920657 31.668114 8.0150508 31.844846 8.0585938 32 C 8.5570234 28.027243 10.515755 24.509049 13.386719 21.992188 L 12.970703 21.373047 z"/>
       </svg>
       <div><strong id="deskName">Meu Celular</strong><br><small style="color:var(--muted)">~/.local/share/applications/<span id="slugPrev2">meu-celular</span>.desktop</small></div>
     </div>
@@ -239,12 +248,20 @@ footer a{color:var(--accent)}
     <pre><code id="oneliner"></code></pre>
     <div class="btnrow">
       <button id="copyBtn" type="button" data-i18n="b_copy">Copiar comando</button>
+      <button id="linkBtn" class="ghost" type="button" data-i18n="b_link">Copiar link desta config</button>
       <button id="dlDesktopBtn" type="button" data-i18n="b_desktop">Baixar .desktop</button>
       <button id="dlBtn" class="ghost" type="button" data-i18n="b_sh">Baixar .sh</button>
     </div>
     <p class="hint" style="color:var(--muted);font-size:.85rem" data-i18n="h_dl">O oneliner instala o scrcpy e cria o atalho. O .desktop é só o atalho (para quem já tem o scrcpy instalado) — salve em ~/.local/share/applications/.</p>
     <details class="adv"><summary data-i18n="sum_desktop">Prévia do .desktop gerado</summary><pre><code id="desktopPrev"></code></pre></details>
-    <section class="card" id="s-about">
+    <section class="card" id="s-api">
+    <h2 data-i18n="s_api">Integração: query string, upload e arquivos</h2>
+    <p data-i18n="p_api1">Qualquer parâmetro do scrcpy pode vir na query string com o nome da flag longa (sem --): booleanos como ?no-audio ou ?fullscreen, valores como ?max-size=1024&amp;video-codec=h265. Extras: shortcut-name, version (latest|v4.1|v3.3.4|outra tag), K|M|G (atalhos físicos) e icon-bg|icon-fg|icon-screen|icon-eyes (hex). Exemplo: ?shortcut-name=TV&amp;max-size=1024&amp;no-audio&amp;video-codec=h265. A query tem prioridade sobre o #hash salvo.</p>
+    <p data-i18n="p_api2">Upload de .desktop: o formulário lê Name= e Exec= de um atalho existente (flags longas com = ou espaço e atalhos -d -e -m -b -f -n -K -M -G -w -S -t -x -s -p -r), preenche os campos e avisa o que foi ignorado. Cores do ícone não são recuperadas do SVG.</p>
+    <p data-i18n="p_api3">Arquivos: install.sh aceita --shortcut-name, --scrcpy-args, --icon-bg/fg/screen/eyes, --icon-url e --shortcut-only; o ícone é sempre o scrcpy.svg oficial recolorido via sed. Documentação para IAs em llms.txt. O formulário nunca envia dados: tudo roda no navegador.</p>
+  </section>
+
+  <section class="card" id="s-about">
     <h2 data-i18n="s_about">Sobre o scrcpy</h2>
     <p data-i18n="p_about1">Scrcpy (pronuncia-se “screen copy”) é um aplicativo gratuito e de código aberto que espelha e controla dispositivos Android via USB ou TCP/IP — sem root e sem instalar nada permanente no aparelho. Leve (nativo), 30–120 fps, latência de 35–70 ms, qualidade 1080p ou superior e inicialização em ~1 segundo. Sem conta, sem anúncios e sem internet: funciona offline.</p>
     <div class="grid">
@@ -314,7 +331,15 @@ s_legal:"Legal notices",sum_disclaimer:"Disclaimer",p_disclaimer:"Informational 
 sum_privacy:"Privacy",p_privacy:"This generator runs 100% in your browser: no form data is sent to any server (state lives only in the URL #hash, locally). No registration, no first-party cookies, no analytics. External links (GitHub) follow those sites’ policies.",
 sum_terms:"Terms of use",p_terms:"By using this page you agree to use the information at your own risk, follow applicable laws and the software license terms (scrcpy’s Apache 2.0; this repo’s installer is MIT). Content is educational and may change without notice.",
 f_footer:"scrcpy-installer · scrcpy is Apache-2.0 © Genymobile · MIT installer · no official affiliation ·",
-v_excl:"--prefer-text and --raw-key-events are mutually exclusive.",v_sdk:"--prefer-text/--raw-key-events require --keyboard=sdk.",v_mouse:"--mouse=sdk needs video playback (uncheck --no-video or use uhid).",v_dup:"--audio-dup requires --audio-source=playback.",v_cam:"Camera options need source = camera (auto-applied).",v_v4:"Checked flags (v4+) require scrcpy v4 or newer.",v_otg:"--otg disables mirroring; conflicts with camera source.",copied:"Copied!"},
+v_excl:"--prefer-text and --raw-key-events are mutually exclusive.",v_sdk:"--prefer-text/--raw-key-events require --keyboard=sdk.",v_mouse:"--mouse=sdk needs video playback (uncheck --no-video or use uhid).",v_dup:"--audio-dup requires --audio-source=playback.",v_cam:"Camera options need source = camera (auto-applied).",v_v4:"Checked flags (v4+) require scrcpy v4 or newer.",v_otg:"--otg disables mirroring; conflicts with camera source.",copied:"Copied!",
+h_qs:"Tip: you can pre-fill via URL, e.g. ?max-size=1024&no-audio&shortcut-name=TV — see “Integration”.",
+f_upload:"Edit existing .desktop",h_upload:"Upload fills the form (Name + Exec).",
+s_api:"Integration: query string, upload & files",
+p_api1:"Any scrcpy parameter can come from the query string using the long flag name (without --): booleans like ?no-audio or ?fullscreen, values like ?max-size=1024&video-codec=h265. Extras: shortcut-name, version (latest|v4.1|v3.3.4|other tag), K|M|G (physical shorthands) and icon-bg|icon-fg|icon-screen|icon-eyes (hex). Example: ?shortcut-name=TV&max-size=1024&no-audio&video-codec=h265. The query wins over the saved #hash.",
+p_api2:"Desktop upload: the form reads Name= and Exec= from an existing shortcut (long flags with = or space, plus shorthands -d -e -m -b -f -n -K -M -G -w -S -t -x -s -p -r), fills the fields and reports what was skipped. Icon colors cannot be recovered from the SVG.",
+p_api3:"Files: install.sh accepts --shortcut-name, --scrcpy-args, --icon-bg/fg/screen/eyes, --icon-url and --shortcut-only; the icon is always the official scrcpy.svg recolored via sed. AI docs live in llms.txt. The form never sends data: everything runs in the browser.",
+b_link:"Copy link of this config",
+up_skip:"Skipped: ",up_noexec:"No Exec= line found",up_empty:"No Name=/Exec= found",up_icon:"icon colors are not imported"},
 es:{gen:"— generador de comandos",sub:"Configure scrcpy con el formulario. Al final, un comando copiable instala scrcpy desde el repo oficial, lo añade al PATH y crea un acceso .desktop con su configuración e icono personalizado.",
 s1:"1. Acceso y versión",s1h:"El nombre será el título y el archivo .desktop (ej.: “Mi Teléfono” → mi-teléfono.desktop).",
 s2:"2. Conexión",h2:"USB por defecto. Complete serial/TCP-IP solo si lo necesita.",
@@ -338,7 +363,15 @@ s_legal:"Avisos legales",sum_disclaimer:"Descargo",p_disclaimer:"Contenido solo 
 sum_privacy:"Privacidad",p_privacy:"Este generador corre 100% en su navegador: ningún dato del formulario se envía a servidores (el estado vive solo en el #hash de la URL, local). Sin registro, sin cookies propias, sin analytics. Los enlaces externos (GitHub) siguen las políticas de esos sitios.",
 sum_terms:"Términos de uso",p_terms:"Al usar esta página acepta usar la información bajo su riesgo, seguir las leyes aplicables y los términos de la licencia (Apache 2.0 de scrcpy; el instalador de este repo es MIT). El contenido es educativo y puede cambiar sin aviso.",
 f_footer:"scrcpy-installer · scrcpy es Apache-2.0 © Genymobile · instalador MIT · sin afiliación oficial ·",
-v_excl:"--prefer-text y --raw-key-events son mutuamente excluyentes.",v_sdk:"--prefer-text/--raw-key-events exigen --keyboard=sdk.",v_mouse:"--mouse=sdk necesita reproducción de video (desmarque --no-video o use uhid).",v_dup:"--audio-dup exige --audio-source=playback.",v_cam:"Las opciones de cámara exigen fuente = camera (auto-aplicado).",v_v4:"Las flags marcadas (v4+) exigen scrcpy v4 o superior.",v_otg:"--otg desactiva el espejado; conflita con fuente cámara.",copied:"¡Copiado!"}
+v_excl:"--prefer-text y --raw-key-events son mutuamente excluyentes.",v_sdk:"--prefer-text/--raw-key-events exigen --keyboard=sdk.",v_mouse:"--mouse=sdk necesita reproducción de video (desmarque --no-video o use uhid).",v_dup:"--audio-dup exige --audio-source=playback.",v_cam:"Las opciones de cámara exigen fuente = camera (auto-aplicado).",v_v4:"Las flags marcadas (v4+) exigen scrcpy v4 o superior.",v_otg:"--otg desactiva el espejado; conflita con fuente cámara.",copied:"¡Copiado!",
+h_qs:"Consejo: puede precargar por URL, ej. ?max-size=1024&no-audio&shortcut-name=TV — vea “Integración”.",
+f_upload:"Editar .desktop existente",h_upload:"La subida completa el formulario (Name + Exec).",
+s_api:"Integración: query string, subida y archivos",
+p_api1:"Cualquier parámetro de scrcpy puede venir en la query string con el nombre de la flag larga (sin --): booleanos como ?no-audio o ?fullscreen, valores como ?max-size=1024&video-codec=h265. Extras: shortcut-name, version (latest|v4.1|v3.3.4|otra etiqueta), K|M|G (atajos físicos) e icon-bg|icon-fg|icon-screen|icon-eyes (hex). Ejemplo: ?shortcut-name=TV&max-size=1024&no-audio&video-codec=h265. La query prevalece sobre el #hash guardado.",
+p_api2:"Subida de .desktop: el formulario lee Name= y Exec= de un acceso existente (flags largas con = o espacio, más atajos -d -e -m -b -f -n -K -M -G -w -S -t -x -s -p -r), completa los campos e informa lo omitido. Los colores del icono no se recuperan del SVG.",
+p_api3:"Archivos: install.sh acepta --shortcut-name, --scrcpy-args, --icon-bg/fg/screen/eyes, --icon-url y --shortcut-only; el icono es siempre el scrcpy.svg oficial recolorido vía sed. Docs para IA en llms.txt. El formulario nunca envía datos: todo corre en el navegador.",
+b_link:"Copiar enlace de esta config",
+up_skip:"Omitidas: ",up_noexec:"Sin línea Exec=",up_empty:"Sin Name=/Exec=",up_icon:"colores del icono no se importan"}
 };
 function autoLang(){var l=(navigator.language||"pt").slice(0,2);if(!I18N[l])l="pt";try{var s=localStorage.getItem("scrcpy-gen-lang");if(s&&(I18N[s]||s==="pt"))l=s;}catch(e){}return l;}
 function applyLang(l){LANG=l;var d=I18N[l]||{};document.querySelectorAll("[data-i18n]").forEach(function(el){if(el.dataset.orig===undefined)el.dataset.orig=el.innerHTML;var k=el.getAttribute("data-i18n");el.innerHTML=(l==="pt"||!d[k])?el.dataset.orig:d[k];});document.documentElement.lang=l==="pt"?"pt-BR":l;try{localStorage.setItem("scrcpy-gen-lang",l);}catch(e){}update();}
@@ -427,6 +460,60 @@ function validate(){
   if(checked("otg")&&val("vsource")==="camera")w.push(["warn",T("v_otg")]);
   return w;
 }
+var QMAP=[["shortcut-name","shortcutName","t"],["serial","serial","t"],["select-usb","selUsb","b"],["select-tcpip","selTcpip","b"],["tcpip","tcpip","tv"],["port","port","t"],["max-size","maxSize","t"],["video-bit-rate","bitrate","t"],["max-fps","maxFps","t"],["video-codec","codec","s"],["video-encoder","encoder","t"],["video-source","vsource","s"],["display-id","displayId","t"],["capture-orientation","capOrient","t"],["crop","crop","t"],["no-video","noVideo","b"],["fullscreen","fullscreen","b"],["no-window","noWindow","b"],["always-on-top","onTop","b"],["window-borderless","borderless","b"],["window-title","winTitle","t"],["window-width","winW","t"],["window-height","winH","t"],["disable-screensaver","screensaver","b"],["print-fps","printFps","b"],["no-audio","noAudio","b"],["audio-codec","acodec","s"],["audio-bit-rate","abitrate","t"],["audio-source","asource","s"],["audio-dup","audioDup","b"],["audio-buffer","abuffer","t"],["no-control","noControl","b"],["keyboard","keyboard","s"],["K","flagK","b"],["mouse","mouse","s"],["M","flagM","b"],["gamepad","gamepad","s"],["G","flagG","b"],["prefer-text","preferText","b"],["raw-key-events","rawKeys","b"],["no-key-repeat","noKeyRepeat","b"],["legacy-paste","legacyPaste","b"],["no-clipboard-autosync","noClipSync","b"],["shortcut-mod","shortcutMod","t"],["push-target","pushTarget","t"],["record","record","t"],["record-format","recordFmt","s"],["camera-facing","camFacing","s"],["camera-size","camSize","t"],["camera-fps","camFps","t"],["new-display","newDisplay","t"],["start-app","startApp","t"],["otg","otg","b"],["stay-awake","stayAwake","b"],["turn-screen-off","screenOff","b"],["show-touches","showTouches","b"],["power-off-on-close","powerOff","b"],["time-limit","timeLimit","t"],["flex-display","flex","b"],["render-fit","renderFit","s"],["keep-active","keepActive","b"],["background-color","bgColor","t"],["camera-torch","camTorch","b"],["icon-bg","iconBg","t"],["icon-fg","iconFg","t"],["icon-screen","iconScreen","t"],["icon-eyes","iconEyes","t"]];
+var REV={};QMAP.forEach(function(m){REV[m[0]]=m;});
+function setField(id,type,v){
+  var el=$(id);if(!el)return false;
+  if(type==="b"){el.checked=(v===""||v==="1"||v==="true");return true;}
+  if(el.tagName==="SELECT"){var ok=false;for(var i=0;i<el.options.length;i++)if(el.options[i].value===v||el.options[i].text===v){ok=true;break;}if(!ok)return false;el.value=v;return true;}
+  el.value=v;return true;
+}
+function applyQuery(){
+  var qs=location.search;if(!qs)return false;
+  var sp;try{sp=new URLSearchParams(qs);}catch(e){return false;}
+  var n=0;
+  if(sp.has("version")){var vv=sp.get("version");var sel=$("scrVersion");var found=false;for(var i=0;i<sel.options.length;i++)if(sel.options[i].value===vv){found=true;break;}if(found&&vv!=="custom")sel.value=vv;else{sel.value="custom";$("customVer").value=vv;}n++;}
+  QMAP.forEach(function(m){var q=m[0],id=m[1],ty=m[2];if(!sp.has(q))return;var v=sp.get(q);
+    if(ty==="tv"){$("tcpipFlag").checked=true;if(v)$("tcpip").value=v;n++;return;}
+    if(setField(id,ty,v))n++;});
+  $("customVerWrap").hidden=$("scrVersion").value!=="custom";
+  return n>0;
+}
+function buildQuery(){
+  var p=[];var ver=$("scrVersion").value;
+  p.push("shortcut-name="+encodeURIComponent(val("shortcutName")||"scrcpy"));
+  if(ver==="custom"&&val("customVer"))p.push("version="+encodeURIComponent(val("customVer")));
+  else if(ver!=="latest")p.push("version="+encodeURIComponent(ver));
+  QMAP.forEach(function(m){var q=m[0],id=m[1],ty=m[2];if(q==="shortcut-name")return;var el=$(id);if(!el)return;
+    if(ty==="b"){if(el.checked)p.push(encodeURIComponent(q));}
+    else if(ty==="tv"){if(id==="tcpip"&&$("tcpipFlag").checked){p.push(val("tcpip")?encodeURIComponent(q)+"="+encodeURIComponent(val("tcpip")):encodeURIComponent(q));}}
+    else{var v=(el.value||"").trim();if(v!=="")p.push(encodeURIComponent(q)+"="+encodeURIComponent(v));}});
+  return p.join("&");
+}
+function tokenize(s){var out=[],cur="",q=null;for(var i=0;i<s.length;i++){var c=s[i];if(q){if(c===q)q=null;else if(c==="\\"&&q==='"'){i++;cur+=s[i]||"";}else cur+=c;}else if(c==='"'||c==="'")q=c;else if(/\s/.test(c)){if(cur!==""){out.push(cur);cur="";}}else cur+=c;}if(cur!=="")out.push(cur);return out;}
+var BOOLS={ "select-usb":1,"select-tcpip":1,"no-video":1,"fullscreen":1,"no-window":1,"always-on-top":1,"window-borderless":1,"disable-screensaver":1,"print-fps":1,"no-audio":1,"audio-dup":1,"no-control":1,"prefer-text":1,"raw-key-events":1,"no-key-repeat":1,"legacy-paste":1,"no-clipboard-autosync":1,"otg":1,"stay-awake":1,"turn-screen-off":1,"show-touches":1,"power-off-on-close":1,"flex-display":1,"keep-active":1,"camera-torch":1 };
+var SHORTS={"-d":"select-usb","-e":"select-tcpip","-f":"fullscreen","-n":"no-control","-K":"K","-M":"M","-G":"G","-w":"stay-awake","-S":"turn-screen-off","-t":"show-touches","-x":"flex-display"};
+var SHORTVAL={"-s":"serial","-p":"port","-m":"max-size","-b":"video-bit-rate","-r":"record"};
+function stripQ(s){if(s.length>1&&((s[0]==='"'&&s[s.length-1]==='"')||(s[0]==="'"&&s[s.length-1]==="'")))return s.slice(1,-1);return s;}
+function applyTokens(toks){
+  var skip=[],used=0,i=0;
+  if(toks.length&&toks[0][0]!=="-")i=1;
+  for(;i<toks.length;i++){
+    var t=toks[i],flag=null,v=null;
+    if(t.slice(0,2)==="--"){var eq=t.indexOf("=");if(eq>0){flag=t.slice(2,eq);v=t.slice(eq+1);}else{flag=t.slice(2);if(!BOOLS[flag]&&flag!=="tcpip"&&i+1<toks.length&&toks[i+1][0]!=="-"){v=toks[++i];}}}
+    else if(SHORTS[t]){flag=SHORTS[t];}
+    else if(SHORTVAL[t]){flag=SHORTVAL[t];if(i+1<toks.length)v=toks[++i];else{skip.push(t);continue;}}
+    else if(t[0]==="-"&&t.length===2){skip.push(t);continue;}
+    else{skip.push(t);continue;}
+    var m=REV[flag];
+    if(!m){skip.push(t);continue;}
+    var id=m[1],ty=m[2];
+    if(ty==="b"){setField(id,"b","1");used++;}
+    else if(ty==="tv"){if(id==="tcpip"){$("tcpipFlag").checked=true;if(v)setField("tcpip","t",stripQ(v));used++;}else skip.push(t);}
+    else{if(v===null||v===undefined){skip.push(t);continue;}if(setField(id,"s"===ty?"s":"t",stripQ(v)))used++;else skip.push(t);}
+  }
+  return {used:used,skip:skip};
+}
 function update(){
   var name=val("shortcutName")||"Meu Celular";
   var slug=slugify(name);
@@ -483,8 +570,34 @@ $("dlBtn").addEventListener("click",function(){
   var blob=new Blob(["#!/usr/bin/env bash\n"+$("oneliner").textContent.replace(/^curl.*\|\s*bash -s --\s*/,"bash install.sh ")+"\n"],{type:"text/x-sh"});
   var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="scrcpy-setup.sh";a.click();setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
 });
+$("linkBtn").addEventListener("click",function(){
+  var base=location.href.split("#")[0].split("?")[0];
+  var link=base+"?"+buildQuery();
+  function ok(){var b=$("linkBtn");var prev=b.textContent;b.textContent=T("copied");setTimeout(function(){b.textContent=prev;},1500);}
+  try{history.replaceState(null,"","?"+buildQuery());}catch(e){}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(link).then(ok,fallback);
+  else fallback();
+  function fallback(){var ta=document.createElement("textarea");ta.value=link;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");ok();}catch(e){}document.body.removeChild(ta);}
+});
+$("desktopFile").addEventListener("change",function(){
+  var f=$("desktopFile").files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){
+    var txt=String(r.result||"");var name=null,exec=null;
+    txt.split(/\r?\n/).forEach(function(line){var m=/^\s*Name\s*=(.*)$/.exec(line);if(m&&name===null)name=stripQ(m[1].trim());var e=/^\s*Exec\s*=(.*)$/.exec(line);if(e&&exec===null)exec=e[1].trim();});
+    var notes=[];
+    if(name){$("shortcutName").value=name;}
+    if(exec){var res=applyTokens(tokenize(exec));notes.push("Exec: "+res.used+" flags");if(res.skip.length)notes.push(T("up_skip")+res.skip.join(" "));}
+    else notes.push(T("up_noexec"));
+    if(!name&&!exec)notes.push(T("up_empty"));
+    notes.push(T("up_icon"));
+    $("uploadNote").textContent=notes.join(" · ");
+    update();
+  };
+  r.readAsText(f);
+});
 $("lang").addEventListener("change",function(){applyLang($("lang").value);});
-(function init(){var l=autoLang();$("lang").value=l;applyLang(l);restore();$("customVerWrap").hidden=$("scrVersion").value!=="custom";update();})();
+(function init(){var l=autoLang();$("lang").value=l;applyLang(l);restore();applyQuery();$("customVerWrap").hidden=$("scrVersion").value!=="custom";update();})();
 })();
 </script>
 </body>

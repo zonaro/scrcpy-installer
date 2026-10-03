@@ -66,3 +66,56 @@ debugging enabled.
 Unofficial page, no affiliation with Genymobile. Informational content only,
 no warranties, use at your own risk. No data collection on this page.
 scrcpy is Apache 2.0; the installer script is MIT.
+
+## Query-string API (deep links / AI-generated links)
+
+Every scrcpy long flag works as a query param WITHOUT the leading `--`.
+Booleans are bare: `?no-audio&fullscreen&stay-awake`.
+Valued flags use `=`: `?max-size=1024&video-codec=h265&window-title=TV`.
+Extra params (not scrcpy flags):
+`shortcut-name`, `version` (latest|v4.1|v3.3.4|any other tag),
+`K|M|G` (bare = physical keyboard/mouse/gamepad),
+`icon-bg|icon-fg|icon-screen|icon-eyes` (hex, same defaults as installer).
+Full example:
+`?shortcut-name=TV&version=v4.1&max-size=1024&no-audio&video-codec=h265&fullscreen&icon-bg=%23000000`
+Precedence on load: `#hash` state first, then query string (query wins),
+then live edits. The "Copy link of this config" button serializes the
+current form back into this exact format (canonical page URL + `?` + params).
+
+## .desktop upload (reverse edit)
+
+The file input accepts an existing `.desktop` file. The parser reads:
+- `Name=` -> config name field (surrounding quotes stripped).
+- `Exec=` -> shell-like tokenization (single/double quotes respected),
+  first token (binary path) dropped, then long flags as `--flag=value` or
+  `--flag value`, plus short flags `-d -e -f -n -K -M -G -w -S -t -x`
+  (booleans) and `-s -p -m -b -r` (with value). `--keyboard=uhid` maps to the
+  keyboard select (not the -K checkbox); `-K` maps to the checkbox.
+  Unknown/unsupported flags are listed in the `#uploadNote` line, nothing
+  is silently dropped. Icon colors are NOT recovered (SVG has no metadata
+  about the recolor); they stay at the form's current values.
+
+## Icon pipeline (official SVG, recolored)
+
+The preview embeds the byte-identical official
+`Genymobile/scrcpy @ master : app/data/scrcpy.svg`, except the recolorable
+shapes use presentation attributes + ids instead of `style="fill:..."`:
+`#pvBg` (frame, default #077063), `#pvFg` + `#pvAnt1/#pvAnt2` (body/antennas,
+default #30dd81), `#pvScreen` (lower screen, default #e4e4e4),
+`#pvEye1/#pvEye2` (eyes, default #ffffff). Shadows/highlights (#cccccc,
+opacity layers) are untouched. Live preview sets fill/stroke attributes.
+`install.sh` does the equivalent server-side with case-insensitive
+`sed s/#077063/<bg>/gI` etc. on the downloaded SVG, so preview and installed
+icon always match.
+
+## Page internals (for automation)
+
+- Single file `docs/index.html`, vanilla JS, no network calls at runtime.
+- i18n: `data-i18n` keys, `I18N = {en:{...}, es:{...}}`, pt-BR inline as
+  fallback (`el.dataset.orig`), persisted `localStorage scrcpy-gen-lang`.
+- State: `QMAP` = [[query-flag, fieldId, type]] with types
+  t(ext)|s(elect)|b(bool)|tv (tcpip flag+value); `buildArgs()` emits flags
+  in stable order with shell quoting; `buildQuery()` inverts it for links.
+- Outputs: `#oneliner` (install+shortcut), `#desktopPrev` (.desktop text),
+  `.desktop` download named `<slug>.desktop`, `.sh` download wrapping the
+  oneliner for `bash install.sh ...`.
