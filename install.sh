@@ -166,15 +166,25 @@ create_shortcut() { # uses SHORTCUT_NAME, SCRCPY_ARGS, ICON_* globals
 
     local icon_file="$icon_dir/$slug.svg"
     local desk_file="$app_dir/$slug.desktop"
+    local changed=0
 
-    info "creating icon $icon_file ..."
+    # Each shortcut owns its icon ($slug.svg): only (re)write it when this
+    # shortcut is new or its requested colors differ from what's on disk,
+    # so other shortcuts' icons are never touched.
+    info "checking icon $icon_file ..."
     if download "$ICON_URL" "$TMP_DIR/icon.svg"; then
         sed -e "s/#077063/${ICON_BG}/gI" \
             -e "s/#30dd81/${ICON_FG}/gI" \
             -e "s/#e4e4e4/${ICON_SCREEN}/gI" \
             -e "s/#ffffff/${ICON_EYES}/gI" \
             "$TMP_DIR/icon.svg" > "$TMP_DIR/icon-out.svg"
-        run_priv install -m 644 "$TMP_DIR/icon-out.svg" "$icon_file"
+        if [ -f "$icon_file" ] && cmp -s "$TMP_DIR/icon-out.svg" "$icon_file"; then
+            info "icon already up to date, keeping existing file"
+        else
+            run_priv install -m 644 "$TMP_DIR/icon-out.svg" "$icon_file"
+            changed=1
+            info "icon installed ($icon_file)"
+        fi
     else
         warn "could not download icon from $ICON_URL; shortcut will use a generic icon"
         icon_file="video-display"
@@ -183,7 +193,6 @@ create_shortcut() { # uses SHORTCUT_NAME, SCRCPY_ARGS, ICON_* globals
     local exec_line="$bin"
     [ -n "$SCRCPY_ARGS" ] && exec_line="$exec_line $SCRCPY_ARGS"
 
-    info "creating shortcut $desk_file ..."
     {
         printf '[Desktop Entry]\n'
         printf 'Name=%s\n' "$name"
@@ -196,10 +205,17 @@ create_shortcut() { # uses SHORTCUT_NAME, SCRCPY_ARGS, ICON_* globals
         printf 'StartupWMClass=scrcpy\n'
         printf 'Keywords=scrcpy;android;mirror;\n'
     } > "$TMP_DIR/$slug.desktop"
-    run_priv install -m 644 "$TMP_DIR/$slug.desktop" "$desk_file"
-    run_priv chmod +x "$desk_file" 2>/dev/null || true
+    if [ -f "$desk_file" ] && cmp -s "$TMP_DIR/$slug.desktop" "$desk_file"; then
+        info "shortcut already up to date ($desk_file)"
+    else
+        if [ -f "$desk_file" ]; then info "replacing existing shortcut $desk_file ..."
+        else info "creating shortcut $desk_file ..."; fi
+        run_priv install -m 644 "$TMP_DIR/$slug.desktop" "$desk_file"
+        run_priv chmod +x "$desk_file" 2>/dev/null || true
+        changed=1
+    fi
 
-    if command -v update-desktop-database >/dev/null 2>&1; then
+    if [ "$changed" -eq 1 ] && command -v update-desktop-database >/dev/null 2>&1; then
         run_priv update-desktop-database -q "$app_dir" 2>/dev/null || true
     fi
     info "shortcut '$name' ready ($desk_file)"
