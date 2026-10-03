@@ -3,8 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>scrcpy-installer — gerador de comando</title>
-<meta name="description" content="Configure o scrcpy por formulário e gere um comando oneliner que instala e cria um atalho .desktop com a sua configuração.">
+<title>scrcpy-installer — gerador de comando oneliner e atalho .desktop</title>
+<meta name="description" content="Configure o scrcpy por formulário (espelhamento Android via USB ou TCP/IP) e gere um comando oneliner que instala do repositório oficial e cria um atalho .desktop com ícone personalizado. PT-BR, EN e ES.">
+<meta name="keywords" content="scrcpy, android, screen mirroring, espelhar tela android, scrcpy gui, scrcpy config, .desktop, linux, usb debugging, tcpip, Genymobile">
+<meta name="author" content="scrcpy-installer">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://zonaro.github.io/scrcpy-installer/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="scrcpy-installer">
+<meta property="og:title" content="scrcpy-installer — gerador de comando oneliner e atalho .desktop">
+<meta property="og:description" content="Formulário que gera comando de instalação do scrcpy + atalho .desktop com a sua configuração e ícone SVG personalizado.">
+<meta property="og:url" content="https://zonaro.github.io/scrcpy-installer/">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="es_ES">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="scrcpy-installer — gerador de comando">
+<meta name="twitter:description" content="Configure o scrcpy pelo formulário e gere um oneliner + atalho .desktop.">
+<meta name="theme-color" content="#077063">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"scrcpy-installer — gerador de comando","url":"https://zonaro.github.io/scrcpy-installer/","applicationCategory":"UtilitiesApplication","operatingSystem":"Linux","inLanguage":["pt-BR","en","es"],"description":"Formulário que gera um comando oneliner para instalar o scrcpy do repositório oficial e criar um atalho .desktop com a configuração escolhida e ícone SVG personalizado.","offers":{"@type":"Offer","price":"0"},"license":"https://opensource.org/licenses/MIT","author":{"@type":"Organization","name":"scrcpy-installer"},"isBasedOn":"https://github.com/Genymobile/scrcpy"}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Is scrcpy free to use?","acceptedAnswer":{"@type":"Answer","text":"Yes. scrcpy is free and open source under Apache 2.0: no ads, no premium features, no account required."}},
+{"@type":"Question","name":"Does scrcpy require root access?","acceptedAnswer":{"@type":"Answer","text":"No. It only needs USB debugging enabled in Developer Options."}},
+{"@type":"Question","name":"Can I use scrcpy wirelessly?","acceptedAnswer":{"@type":"Answer","text":"Yes, via TCP/IP after an initial USB setup to enable wireless debugging."}},
+{"@type":"Question","name":"Does scrcpy install anything on my phone?","acceptedAnswer":{"@type":"Answer","text":"It pushes a small server temporarily while running; nothing remains after closing."}},
+{"@type":"Question","name":"Why is there no audio?","acceptedAnswer":{"@type":"Answer","text":"Audio forwarding requires Android 11 or higher."}},
+{"@type":"Question","name":"Can I mirror multiple devices?","acceptedAnswer":{"@type":"Answer","text":"Yes, run one scrcpy instance per device."}}]}
+</script>
 <style>
 :root{
   --bg:#0d1117; --panel:#161b22; --panel2:#1c2330; --border:#30363d;
@@ -74,121 +102,121 @@ footer a{color:var(--accent)}
     <h2 data-i18n="s1">1. Atalho e versão</h2>
     <p class="hint" data-i18n="s1h">O nome vira o título e o arquivo .desktop (ex.: “Meu Celular” → meu-celular.desktop).</p>
     <div class="grid">
-      <div class="field"><label for="shortcutName">Nome da configuração</label><input type="text" id="shortcutName" value="Meu Celular"><small>slug: <span id="slugPrev">meu-celular</span>.desktop</small></div>
-      <div class="field"><label for="scrVersion">Versão do scrcpy <code>--version</code></label>
-        <select id="scrVersion"><option value="latest">latest (padrão)</option><option value="v4.1">v4.1</option><option value="v3.3.4">v3.3.4</option><option value="custom">custom…</option></select></div>
-      <div class="field" id="customVerWrap" hidden><label for="customVer">Tag custom</label><input type="text" id="customVer" placeholder="v3.3.4"></div>
+      <div class="field"><label for="shortcutName"><span data-i18n="f_name">Nome da configuração</span></label><input type="text" id="shortcutName" value="Meu Celular"><small>slug: <span id="slugPrev">meu-celular</span>.desktop</small></div>
+      <div class="field"><label for="scrVersion"><span data-i18n="f_ver">Versão do scrcpy</span> <code>--version</code></label>
+        <select id="scrVersion"><option value="latest" data-i18n="o_latest">latest (padrão)</option><option value="v4.1">v4.1</option><option value="v3.3.4">v3.3.4</option><option value="custom" data-i18n="o_custom">custom…</option></select></div>
+      <div class="field" id="customVerWrap" hidden><label for="customVer"><span data-i18n="f_tag">Tag custom</span></label><input type="text" id="customVer" placeholder="v3.3.4"></div>
     </div>
   </section>
 
   <section class="card" id="s-conn">
     <h2 data-i18n="s2">2. Conexão</h2>
-    <p class="hint">USB por padrão. Preencha serial/TCP-IP só se precisar.</p>
+    <p class="hint" data-i18n="h2">USB por padrão. Preencha serial/TCP-IP só se precisar.</p>
     <div class="grid">
-      <div class="field"><label for="serial">Serial <code>--serial</code></label><input type="text" id="serial" placeholder="emulator-5554"></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="selUsb"> USB <code>-d</code></label><small>Força device USB</small></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="selTcpip"> TCP/IP <code>-e</code></label><small>Força device TCP/IP</small></div>
-      <div class="field"><label for="tcpip">TCP/IP <code>--tcpip[=ip]</code></label><input type="text" id="tcpip" placeholder="192.168.1.42:5555"><small>Vazio + marcado = auto-detect</small></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="tcpipFlag"> Ativar <code>--tcpip</code></label><small>Sem valor: detecta IP do USB</small></div>
-      <div class="field"><label for="port">Porta <code>-p</code></label><input type="text" id="port" placeholder="27183:27199"><small>Default 27183:27199</small></div>
+      <div class="field"><label for="serial"><span data-i18n="f_serial">Serial</span> <code>--serial</code></label><input type="text" id="serial" placeholder="emulator-5554"></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="selUsb"> <span data-i18n="f_usb">USB</span> <code>-d</code></label><small data-i18n="h_usb">Força device USB</small></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="selTcpip"> <span data-i18n="f_e">TCP/IP</span> <code>-e</code></label><small data-i18n="h_e">Força device TCP/IP</small></div>
+      <div class="field"><label for="tcpip"><span data-i18n="f_tcpip">TCP/IP</span> <code>--tcpip[=ip]</code></label><input type="text" id="tcpip" placeholder="192.168.1.42:5555"><small data-i18n="h_tcpip">Vazio + marcado = auto-detect</small></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="tcpipFlag"> <span data-i18n="f_tcpipf">Ativar</span> <code>--tcpip</code></label><small data-i18n="h_tcpipf">Sem valor: detecta IP do USB</small></div>
+      <div class="field"><label for="port"><span data-i18n="f_port">Porta</span> <code>-p</code></label><input type="text" id="port" placeholder="27183:27199"><small data-i18n="h_port">Default 27183:27199</small></div>
     </div>
   </section>
 
   <section class="card" id="s-video">
     <h2 data-i18n="s3">3. Vídeo e janela</h2>
-    <p class="hint">Dica: <code>--max-size 1024</code> melhora muito a performance.</p>
+    <p class="hint"><span data-i18n="h3">Dica:</span> <code>--max-size 1024</code> <span data-i18n="h3b">melhora muito a performance.</span></p>
     <div class="grid">
-      <div class="field"><label for="maxSize">Tamanho máx (px) <code>-m</code></label><input type="number" id="maxSize" min="0" placeholder="0 = sem limite"></div>
-      <div class="field"><label for="bitrate">Bit-rate <code>-b</code></label><input type="text" id="bitrate" placeholder="8M"></div>
-      <div class="field"><label for="maxFps">FPS máx <code>--max-fps</code></label><input type="number" id="maxFps" min="0" placeholder="ilimitado"></div>
-      <div class="field"><label for="codec">Codec <code>--video-codec</code></label><select id="codec"><option value="">padrão (h264)</option><option>h264</option><option>h265</option><option>av1</option></select></div>
-      <div class="field"><label for="encoder">Encoder <code>--video-encoder</code></label><input type="text" id="encoder" placeholder="auto"></div>
-      <div class="field"><label for="vsource">Fonte <code>--video-source</code></label><select id="vsource"><option value="display">display</option><option value="camera">camera (Android 12+)</option></select></div>
-      <div class="field"><label for="displayId">Display id <code>--display-id</code></label><input type="number" id="displayId" min="0" placeholder="0"></div>
-      <div class="field"><label for="capOrient">Captura <code>--capture-orientation</code></label><select id="capOrient"><option value="">0 (padrão)</option><option>0</option><option>90</option><option>180</option><option>270</option><option>@90 (travar)</option><option>@ (travar inicial)</option></select></div>
-      <div class="field"><label for="crop">Crop <code>--crop w:h:x:y</code></label><input type="text" id="crop" placeholder="1224:1440:0:0"></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="noVideo"> Sem vídeo <code>--no-video</code></label></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="fullscreen"> Fullscreen <code>-f</code></label></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="noWindow"> Sem janela <code>--no-window</code></label></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="onTop"> Sempre no topo <code>--always-on-top</code></label></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="borderless"> Sem bordas <code>--window-borderless</code></label></div>
-      <div class="field"><label for="winTitle">Título <code>--window-title</code></label><input type="text" id="winTitle" placeholder="Meu Celular"></div>
-      <div class="field"><label for="winW">Largura <code>--window-width</code></label><input type="number" id="winW" min="0" placeholder="auto"></div>
-      <div class="field"><label for="winH">Altura <code>--window-height</code></label><input type="number" id="winH" min="0" placeholder="auto"></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="screensaver"> Desligar screensaver <code>--disable-screensaver</code></label></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="printFps"> Mostrar FPS <code>--print-fps</code></label></div>
+      <div class="field"><label for="maxSize"><span data-i18n="f_maxsize">Tamanho máx (px)</span> <code>-m</code></label><input type="number" id="maxSize" min="0" placeholder="0 = sem limite"></div>
+      <div class="field"><label for="bitrate"><span data-i18n="f_bitrate">Bit-rate</span> <code>-b</code></label><input type="text" id="bitrate" placeholder="8M"></div>
+      <div class="field"><label for="maxFps"><span data-i18n="f_maxfps">FPS máx</span> <code>--max-fps</code></label><input type="number" id="maxFps" min="0" placeholder="ilimitado"></div>
+      <div class="field"><label for="codec"><span data-i18n="f_codec">Codec</span> <code>--video-codec</code></label><select id="codec"><option value="" data-i18n="o_defh264">padrão (h264)</option><option>h264</option><option>h265</option><option>av1</option></select></div>
+      <div class="field"><label for="encoder"><span data-i18n="f_encoder">Encoder</span> <code>--video-encoder</code></label><input type="text" id="encoder" placeholder="auto"></div>
+      <div class="field"><label for="vsource"><span data-i18n="f_vsource">Fonte</span> <code>--video-source</code></label><select id="vsource"><option value="display">display</option><option value="camera" data-i18n="o_cam12">camera (Android 12+)</option></select></div>
+      <div class="field"><label for="displayId"><span data-i18n="f_dispid">Display id</span> <code>--display-id</code></label><input type="number" id="displayId" min="0" placeholder="0"></div>
+      <div class="field"><label for="capOrient"><span data-i18n="f_capor">Captura</span> <code>--capture-orientation</code></label><select id="capOrient"><option value="" data-i18n="o_def0">0 (padrão)</option><option value="0">0</option><option value="90">90</option><option value="180">180</option><option value="270">270</option><option value="@90" data-i18n="o_lock">@90 (travar)</option><option value="@" data-i18n="o_lockinit">@ (travar inicial)</option></select></div>
+      <div class="field"><label for="crop"><span data-i18n="f_crop">Crop</span> <code>--crop w:h:x:y</code></label><input type="text" id="crop" placeholder="1224:1440:0:0"></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="noVideo"> <span data-i18n="f_novideo">Sem vídeo</span> <code>--no-video</code></label></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="fullscreen"> <span data-i18n="f_fs">Fullscreen</span> <code>-f</code></label></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="noWindow"> <span data-i18n="f_nowin">Sem janela</span> <code>--no-window</code></label></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="onTop"> <span data-i18n="f_ontop">Sempre no topo</span> <code>--always-on-top</code></label></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="borderless"> <span data-i18n="f_borderless">Sem bordas</span> <code>--window-borderless</code></label></div>
+      <div class="field"><label for="winTitle"><span data-i18n="f_wintitle">Título</span> <code>--window-title</code></label><input type="text" id="winTitle" placeholder="Meu Celular"></div>
+      <div class="field"><label for="winW"><span data-i18n="f_winw">Largura</span> <code>--window-width</code></label><input type="number" id="winW" min="0" placeholder="auto"></div>
+      <div class="field"><label for="winH"><span data-i18n="f_winh">Altura</span> <code>--window-height</code></label><input type="number" id="winH" min="0" placeholder="auto"></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="screensaver"> <span data-i18n="f_ssaver">Desligar screensaver</span> <code>--disable-screensaver</code></label></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="printFps"> <span data-i18n="f_fps">Mostrar FPS</span> <code>--print-fps</code></label></div>
     </div>
   </section>
 
   <section class="card" id="s-audio">
     <h2 data-i18n="s4">4. Áudio</h2>
-    <p class="hint">Android 11+ para forwarding de áudio.</p>
+    <p class="hint" data-i18n="h4">Android 11+ para forwarding de áudio.</p>
     <div class="grid">
-      <div class="field"><label class="checkrow"><input type="checkbox" id="noAudio"> Sem áudio <code>--no-audio</code></label></div>
-      <div class="field"><label for="acodec">Codec <code>--audio-codec</code></label><select id="acodec"><option value="">padrão (opus)</option><option>opus</option><option>aac</option><option>flac</option><option>raw</option></select></div>
-      <div class="field"><label for="abitrate">Bit-rate <code>--audio-bit-rate</code></label><input type="text" id="abitrate" placeholder="128K"></div>
-      <div class="field"><label for="asource">Fonte <code>--audio-source</code></label><select id="asource"><option value="">padrão (output)</option><option>output</option><option>playback</option><option>mic</option><option>mic-unprocessed</option><option>mic-camcorder</option><option>mic-voice-recognition</option><option>mic-voice-communication</option><option>voice-call</option><option>voice-call-uplink</option><option>voice-call-downlink</option><option>voice-performance</option></select></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="audioDup"> Duplicar no device <code>--audio-dup</code></label><small>Requer fonte = playback</small></div>
-      <div class="field"><label for="abuffer">Buffer (ms) <code>--audio-buffer</code></label><input type="number" id="abuffer" min="0" placeholder="50"></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="noAudio"> <span data-i18n="f_noaudio">Sem áudio</span> <code>--no-audio</code></label></div>
+      <div class="field"><label for="acodec"><span data-i18n="f_acodec">Codec</span> <code>--audio-codec</code></label><select id="acodec"><option value="" data-i18n="o_defopus">padrão (opus)</option><option>opus</option><option>aac</option><option>flac</option><option>raw</option></select></div>
+      <div class="field"><label for="abitrate"><span data-i18n="f_abitrate">Bit-rate</span> <code>--audio-bit-rate</code></label><input type="text" id="abitrate" placeholder="128K"></div>
+      <div class="field"><label for="asource"><span data-i18n="f_asource">Fonte</span> <code>--audio-source</code></label><select id="asource"><option value="" data-i18n="o_defoutput">padrão (output)</option><option>output</option><option>playback</option><option>mic</option><option>mic-unprocessed</option><option>mic-camcorder</option><option>mic-voice-recognition</option><option>mic-voice-communication</option><option>voice-call</option><option>voice-call-uplink</option><option>voice-call-downlink</option><option>voice-performance</option></select></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="audioDup"> <span data-i18n="f_audiodup">Duplicar no device</span> <code>--audio-dup</code></label><small data-i18n="h_audiodup">Requer fonte = playback</small></div>
+      <div class="field"><label for="abuffer"><span data-i18n="f_abuffer">Buffer (ms)</span> <code>--audio-buffer</code></label><input type="number" id="abuffer" min="0" placeholder="50"></div>
     </div>
   </section>
 
   <section class="card" id="s-input">
     <h2 data-i18n="s5">5. Controle / input</h2>
     <div class="grid">
-      <div class="field"><label class="checkrow"><input type="checkbox" id="noControl"> Somente leitura <code>-n</code></label></div>
-      <div class="field"><label for="keyboard">Teclado <code>--keyboard</code></label><select id="keyboard"><option value="">auto</option><option>disabled</option><option>sdk</option><option>uhid</option><option>aoa</option></select></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="flagK"> Teclado físico <code>-K</code></label><small>uhid (ou aoa com OTG)</small></div>
-      <div class="field"><label for="mouse">Mouse <code>--mouse</code></label><select id="mouse"><option value="">auto</option><option>disabled</option><option>sdk</option><option>uhid</option><option>aoa</option></select></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="flagM"> Mouse físico <code>-M</code></label></div>
-      <div class="field"><label for="gamepad">Gamepad <code>--gamepad</code></label><select id="gamepad"><option value="">disabled</option><option>disabled</option><option>uhid</option><option>aoa</option></select></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="flagG"> Gamepad <code>-G</code></label></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="preferText"> Preferir texto <code>--prefer-text</code></label><small>Só com keyboard=sdk</small></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="rawKeys"> Raw keys <code>--raw-key-events</code></label><small>Só com keyboard=sdk</small></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="noKeyRepeat"> Sem repetição <code>--no-key-repeat</code></label></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="legacyPaste"> Colar legado <code>--legacy-paste</code></label></div>
-      <div class="field"><label class="checkrow"><input type="checkbox" id="noClipSync"> Sem sync clipboard <code>--no-clipboard-autosync</code></label></div>
-      <div class="field"><label for="shortcutMod">Mod atalhos <code>--shortcut-mod</code></label><input type="text" id="shortcutMod" placeholder="lalt,lsuper"></div>
-      <div class="field"><label for="pushTarget">Destino push <code>--push-target</code></label><input type="text" id="pushTarget" placeholder="/sdcard/Download/"></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="noControl"> <span data-i18n="f_nocontrol">Somente leitura</span> <code>-n</code></label></div>
+      <div class="field"><label for="keyboard"><span data-i18n="f_keyboard">Teclado</span> <code>--keyboard</code></label><select id="keyboard"><option value="">auto</option><option>disabled</option><option>sdk</option><option>uhid</option><option>aoa</option></select></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="flagK"> <span data-i18n="f_flagk">Teclado físico</span> <code>-K</code></label><small data-i18n="h_flagk">uhid (ou aoa com OTG)</small></div>
+      <div class="field"><label for="mouse"><span data-i18n="f_mouse">Mouse</span> <code>--mouse</code></label><select id="mouse"><option value="">auto</option><option>disabled</option><option>sdk</option><option>uhid</option><option>aoa</option></select></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="flagM"> <span data-i18n="f_flagm">Mouse físico</span> <code>-M</code></label></div>
+      <div class="field"><label for="gamepad"><span data-i18n="f_gamepad">Gamepad</span> <code>--gamepad</code></label><select id="gamepad"><option value="">disabled</option><option>disabled</option><option>uhid</option><option>aoa</option></select></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="flagG"> <span data-i18n="f_flagg">Gamepad</span> <code>-G</code></label></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="preferText"> <span data-i18n="f_prefertext">Preferir texto</span> <code>--prefer-text</code></label><small data-i18n="h_sdkonly">Só com keyboard=sdk</small></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="rawKeys"> <span data-i18n="f_rawkeys">Raw keys</span> <code>--raw-key-events</code></label><small data-i18n="h_sdkonly2">Só com keyboard=sdk</small></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="noKeyRepeat"> <span data-i18n="f_nokeyrepeat">Sem repetição</span> <code>--no-key-repeat</code></label></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="legacyPaste"> <span data-i18n="f_legacypaste">Colar legado</span> <code>--legacy-paste</code></label></div>
+      <div class="field"><label class="checkrow"><input type="checkbox" id="noClipSync"> <span data-i18n="f_noclipsync">Sem sync clipboard</span> <code>--no-clipboard-autosync</code></label></div>
+      <div class="field"><label for="shortcutMod"><span data-i18n="f_shortcutmod">Mod atalhos</span> <code>--shortcut-mod</code></label><input type="text" id="shortcutMod" placeholder="lalt,lsuper"></div>
+      <div class="field"><label for="pushTarget"><span data-i18n="f_pushtarget">Destino push</span> <code>--push-target</code></label><input type="text" id="pushTarget" placeholder="/sdcard/Download/"></div>
     </div>
   </section>
 
   <section class="card" id="s-rec">
     <h2 data-i18n="s6">6. Gravação, câmera e display virtual</h2>
     <div class="grid">
-      <div class="field"><label for="record">Gravar em <code>-r</code></label><input type="text" id="record" placeholder="video.mp4"></div>
-      <div class="field"><label for="recordFmt">Formato <code>--record-format</code></label><select id="recordFmt"><option value="">auto (pela extensão)</option><option>mp4</option><option>mkv</option><option>m4a</option><option>mka</option><option>opus</option><option>aac</option><option>flac</option><option>wav</option></select></div>
-      <div class="field"><label for="camFacing">Câmera <code>--camera-facing</code></label><select id="camFacing"><option value="">qualquer</option><option>front</option><option>back</option><option>external</option></select></div>
-      <div class="field"><label for="camSize">Tam. câmera <code>--camera-size</code></label><input type="text" id="camSize" placeholder="1920x1080"></div>
-      <div class="field"><label for="camFps">FPS câmera <code>--camera-fps</code></label><input type="number" id="camFps" min="0" placeholder="30"></div>
-      <div class="field"><label for="newDisplay">Novo display <code>--new-display</code></label><input type="text" id="newDisplay" placeholder="1920x1080/420"></div>
-      <div class="field"><label for="startApp">Iniciar app <code>--start-app</code></label><input type="text" id="startApp" placeholder="org.videolan.vlc"></div>
+      <div class="field"><label for="record"><span data-i18n="f_record">Gravar em</span> <code>-r</code></label><input type="text" id="record" placeholder="video.mp4"></div>
+      <div class="field"><label for="recordFmt"><span data-i18n="f_recordfmt">Formato</span> <code>--record-format</code></label><select id="recordFmt"><option value="" data-i18n="o_autoext">auto (pela extensão)</option><option>mp4</option><option>mkv</option><option>m4a</option><option>mka</option><option>opus</option><option>aac</option><option>flac</option><option>wav</option></select></div>
+      <div class="field"><label for="camFacing"><span data-i18n="f_camfacing">Câmera</span> <code>--camera-facing</code></label><select id="camFacing"><option value="" data-i18n="o_any">qualquer</option><option>front</option><option>back</option><option>external</option></select></div>
+      <div class="field"><label for="camSize"><span data-i18n="f_camsize">Tam. câmera</span> <code>--camera-size</code></label><input type="text" id="camSize" placeholder="1920x1080"></div>
+      <div class="field"><label for="camFps"><span data-i18n="f_camfps">FPS câmera</span> <code>--camera-fps</code></label><input type="number" id="camFps" min="0" placeholder="30"></div>
+      <div class="field"><label for="newDisplay"><span data-i18n="f_newdisplay">Novo display</span> <code>--new-display</code></label><input type="text" id="newDisplay" placeholder="1920x1080/420"></div>
+      <div class="field"><label for="startApp"><span data-i18n="f_startapp">Iniciar app</span> <code>--start-app</code></label><input type="text" id="startApp" placeholder="org.videolan.vlc"></div>
     </div>
-    <details class="adv"><summary>Avançado: OTG / energia / v4</summary>
+    <details class="adv"><summary data-i18n="sum_adv">Avançado: OTG / energia / v4</summary>
       <div class="grid" style="margin-top:10px">
-        <div class="field"><label class="checkrow"><input type="checkbox" id="otg"> Modo OTG <code>--otg</code></label><small>USB, sem espelhamento</small></div>
-        <div class="field"><label class="checkrow"><input type="checkbox" id="stayAwake"> Manter ligado <code>-w</code></label></div>
-        <div class="field"><label class="checkrow"><input type="checkbox" id="screenOff"> Tela off <code>-S</code></label></div>
-        <div class="field"><label class="checkrow"><input type="checkbox" id="showTouches"> Mostrar toques <code>-t</code></label></div>
-        <div class="field"><label class="checkrow"><input type="checkbox" id="powerOff"> Power-off ao fechar <code>--power-off-on-close</code></label></div>
-        <div class="field"><label for="timeLimit">Limite (s) <code>--time-limit</code></label><input type="number" id="timeLimit" min="0" placeholder="0 = sem limite"></div>
-        <div class="field"><label class="checkrow"><input type="checkbox" id="flex"> Flex display <code>-x</code> (v4+)</label></div>
-        <div class="field"><label for="renderFit">Ajuste <code>--render-fit</code> (v4+)</label><select id="renderFit"><option value="">padrão</option><option>letterbox</option><option>stretched</option><option>unscaled</option></select></div>
-        <div class="field"><label class="checkrow"><input type="checkbox" id="keepActive"> Manter ativo <code>--keep-active</code> (v4+)</label></div>
-        <div class="field"><label for="bgColor">Fundo janela <code>--background-color</code> (v4+)</label><input type="text" id="bgColor" placeholder="#222"></div>
-        <div class="field"><label class="checkrow"><input type="checkbox" id="camTorch"> Flash <code>--camera-torch</code> (v4+)</label></div>
+        <div class="field"><label class="checkrow"><input type="checkbox" id="otg"> <span data-i18n="f_otg">Modo OTG</span> <code>--otg</code></label><small data-i18n="h_otg">USB, sem espelhamento</small></div>
+        <div class="field"><label class="checkrow"><input type="checkbox" id="stayAwake"> <span data-i18n="f_stayawake">Manter ligado</span> <code>-w</code></label></div>
+        <div class="field"><label class="checkrow"><input type="checkbox" id="screenOff"> <span data-i18n="f_screenoff">Tela off</span> <code>-S</code></label></div>
+        <div class="field"><label class="checkrow"><input type="checkbox" id="showTouches"> <span data-i18n="f_showtouches">Mostrar toques</span> <code>-t</code></label></div>
+        <div class="field"><label class="checkrow"><input type="checkbox" id="powerOff"> <span data-i18n="f_poweroff">Power-off ao fechar</span> <code>--power-off-on-close</code></label></div>
+        <div class="field"><label for="timeLimit"><span data-i18n="f_timelimit">Limite (s)</span> <code>--time-limit</code></label><input type="number" id="timeLimit" min="0" placeholder="0 = sem limite"></div>
+        <div class="field"><label class="checkrow"><input type="checkbox" id="flex"> <span data-i18n="f_flex">Flex display</span> <code>-x</code> <span data-i18n="tag_v4">(v4+)</span></label></div>
+        <div class="field"><label for="renderFit"><span data-i18n="f_renderfit">Ajuste</span> <code>--render-fit</code> <span data-i18n="tag_v42">(v4+)</span></label><select id="renderFit"><option value="" data-i18n="o_default">padrão</option><option>letterbox</option><option>stretched</option><option>unscaled</option></select></div>
+        <div class="field"><label class="checkrow"><input type="checkbox" id="keepActive"> <span data-i18n="f_keepactive">Manter ativo</span> <code>--keep-active</code> <span data-i18n="tag_v43">(v4+)</span></label></div>
+        <div class="field"><label for="bgColor"><span data-i18n="f_bgcolor">Fundo janela</span> <code>--background-color</code> <span data-i18n="tag_v44">(v4+)</span></label><input type="text" id="bgColor" placeholder="#222"></div>
+        <div class="field"><label class="checkrow"><input type="checkbox" id="camTorch"> <span data-i18n="f_camtorch">Flash</span> <code>--camera-torch</code> <span data-i18n="tag_v45">(v4+)</span></label></div>
       </div>
     </details>
   </section>
 
   <section class="card" id="s-icon">
     <h2 data-i18n="s7">7. Ícone do atalho</h2>
-    <p class="hint">Base: <code>scrcpy.svg</code> oficial. As cores são aplicadas no download pelo instalador.</p>
+    <p class="hint"><span data-i18n="h7">Base:</span> <code>scrcpy.svg</code> <span data-i18n="h7b">oficial. As cores são aplicadas no download pelo instalador.</span></p>
     <div class="grid">
-      <div class="field"><label for="iconBg">Moldura (fundo)</label><input type="color" id="iconBg" value="#077063"></div>
-      <div class="field"><label for="iconFg">Corpo e antenas</label><input type="color" id="iconFg" value="#30dd81"></div>
-      <div class="field"><label for="iconScreen">Tela inferior</label><input type="color" id="iconScreen" value="#e4e4e4"></div>
-      <div class="field"><label for="iconEyes">Olhos / branco</label><input type="color" id="iconEyes" value="#ffffff"></div>
+      <div class="field"><label for="iconBg"><span data-i18n="f_iconbg">Moldura (fundo)</span></label><input type="color" id="iconBg" value="#077063"></div>
+      <div class="field"><label for="iconFg"><span data-i18n="f_iconfg">Corpo e antenas</span></label><input type="color" id="iconFg" value="#30dd81"></div>
+      <div class="field"><label for="iconScreen"><span data-i18n="f_iconscreen">Tela inferior</span></label><input type="color" id="iconScreen" value="#e4e4e4"></div>
+      <div class="field"><label for="iconEyes"><span data-i18n="f_iconeyes">Olhos / branco</span></label><input type="color" id="iconEyes" value="#ffffff"></div>
     </div>
     <div class="preview">
       <svg id="iconPrev" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="prévia do ícone">
@@ -210,26 +238,110 @@ footer a{color:var(--accent)}
     <div id="warnings"></div>
     <pre><code id="oneliner"></code></pre>
     <div class="btnrow">
-      <button id="copyBtn" type="button">Copiar comando</button>
-      <button id="dlBtn" class="ghost" type="button">Baixar .sh</button>
+      <button id="copyBtn" type="button" data-i18n="b_copy">Copiar comando</button>
+      <button id="dlDesktopBtn" type="button" data-i18n="b_desktop">Baixar .desktop</button>
+      <button id="dlBtn" class="ghost" type="button" data-i18n="b_sh">Baixar .sh</button>
     </div>
-    <details class="adv"><summary>Prévia do .desktop gerado</summary><pre><code id="desktopPrev"></code></pre></details>
+    <p class="hint" style="color:var(--muted);font-size:.85rem" data-i18n="h_dl">O oneliner instala o scrcpy e cria o atalho. O .desktop é só o atalho (para quem já tem o scrcpy instalado) — salve em ~/.local/share/applications/.</p>
+    <details class="adv"><summary data-i18n="sum_desktop">Prévia do .desktop gerado</summary><pre><code id="desktopPrev"></code></pre></details>
+    <section class="card" id="s-about">
+    <h2 data-i18n="s_about">Sobre o scrcpy</h2>
+    <p data-i18n="p_about1">Scrcpy (pronuncia-se “screen copy”) é um aplicativo gratuito e de código aberto que espelha e controla dispositivos Android via USB ou TCP/IP — sem root e sem instalar nada permanente no aparelho. Leve (nativo), 30–120 fps, latência de 35–70 ms, qualidade 1080p ou superior e inicialização em ~1 segundo. Sem conta, sem anúncios e sem internet: funciona offline.</p>
+    <div class="grid">
+      <div class="field"><strong>30–120 fps</strong><small data-i18n="h_fps">Taxa de quadros</small></div>
+      <div class="field"><strong>35–70 ms</strong><small data-i18n="h_lat">Latência</small></div>
+      <div class="field"><strong>1080p+</strong><small data-i18n="h_qual">Qualidade</small></div>
+      <div class="field"><strong>Apache 2.0</strong><small data-i18n="h_lic">Licença (Genymobile)</small></div>
+    </div>
+    <p class="hint" data-i18n="p_about2">Recursos: espelhamento de tela, áudio (Android 11+), gravação, câmera (Android 12+), display virtual, clipboard bidirecional, teclado/mouse/gamepad físicos (HID), modo OTG e webcam V4L2 no Linux.</p>
+  </section>
+
+  <section class="card" id="s-req">
+    <h2 data-i18n="s_req">Requisitos e primeiros passos</h2>
+    <ol style="margin:0 0 8px 20px;padding:0">
+      <li data-i18n="req1">Android 5.0 (API 21) ou superior; áudio exige Android 11+, câmera exige Android 12+.</li>
+      <li data-i18n="req2">Ative a depuração USB (Ajustes → Opções do desenvolvedor; toque 7× em “Número da compilação” se oculto) e autorize o RSA no aparelho.</li>
+      <li data-i18n="req3">Instale pelo comando acima (traz um adb embutido se você não tiver um) e rode: <code>scrcpy</code>. Para Wi-Fi: <code>adb connect IP:5555</code> e depois <code>scrcpy</code>.</li>
+    </ol>
+  </section>
+
+  <section class="card" id="s-faq">
+    <h2 data-i18n="s_faq">Perguntas frequentes</h2>
+    <details class="adv"><summary data-i18n="q1">O scrcpy é gratuito?</summary><p data-i18n="a1">Sim — gratuito e open source (Apache 2.0), sem anúncios, sem recursos premium e sem conta.</p></details>
+    <details class="adv"><summary data-i18n="q2">Precisa de root?</summary><p data-i18n="a2">Não. Basta ativar a depuração USB nas Opções do desenvolvedor.</p></details>
+    <details class="adv"><summary data-i18n="q3">Funciona sem fio?</summary><p data-i18n="a3">Sim, via TCP/IP após uma primeira configuração por USB para ativar a depuração sem fio.</p></details>
+    <details class="adv"><summary data-i18n="q4">Instala algo no celular?</summary><p data-i18n="a4">Sobe um servidor temporário durante o uso; nada permanente permanece após fechar.</p></details>
+    <details class="adv"><summary data-i18n="q5">Por que não sai áudio?</summary><p data-i18n="a5">O forwarding de áudio exige Android 11 ou superior.</p></details>
+    <details class="adv"><summary data-i18n="q6">Posso espelhar vários aparelhos?</summary><p data-i18n="a6">Sim — uma instância do scrcpy por dispositivo (use --serial para escolher).</p></details>
+  </section>
+
+  <section class="card" id="s-legal">
+    <h2 data-i18n="s_legal">Avisos legais</h2>
+    <details class="adv"><summary data-i18n="sum_disclaimer">Disclaimer</summary><div data-i18n="p_disclaimer">Conteúdo apenas informativo, sem garantias de completude. Esta página não é afiliada, endossada ou patrocinada pela Genymobile — para informações oficiais, consulte github.com/Genymobile/scrcpy. O scrcpy é Apache 2.0: use por sua conta e risco, respeitando leis aplicáveis e a privacidade de terceiros. Não nos responsabilizamos por danos do uso do site ou do software.</div></details>
+    <details class="adv"><summary data-i18n="sum_privacy">Privacidade</summary><div data-i18n="p_privacy">Este gerador roda 100% no seu navegador: nenhum dado do formulário é enviado a servidores (o estado fica só no #hash da URL, local). Não há registro, cookies próprios ou analytics. Links externos (GitHub) seguem as políticas dos respectivos sites.</div></details>
+    <details class="adv"><summary data-i18n="sum_terms">Termos de uso</summary><div data-i18n="p_terms">Ao usar esta página você concorda em usar as informações por sua conta e risco, seguir as leis aplicáveis e os termos da licença do software (Apache 2.0 do scrcpy; o instalador deste repo é MIT). O conteúdo é educacional e pode mudar sem aviso.</div></details>
   </section>
 </main>
-<footer>scrcpy-installer · scrcpy é Apache-2.0 © Genymobile · instalador MIT · <a href="https://github.com/zonaro/scrcpy-installer">repo</a></footer>
+<footer><span data-i18n="f_footer">scrcpy-installer · scrcpy é Apache-2.0 © Genymobile · instalador MIT · sem afiliação oficial ·</span> <a href="https://github.com/zonaro/scrcpy-installer">repo</a> · <a href="https://github.com/Genymobile/scrcpy">Genymobile/scrcpy</a> · <a href="llms.txt">llms.txt</a></footer>
 <script>
 (function(){
 "use strict";
 var $=function(id){return document.getElementById(id);};
 var BASE="https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/install.sh";
 var DEF={bg:"#077063",fg:"#30dd81",screen:"#e4e4e4",eyes:"#ffffff"};
+var LANG="pt";
 var I18N={
- pt:{gen:"— gerador de comando",sub:"Configure o scrcpy pelo formulário. No final, um comando copiável instala o scrcpy do repositório oficial, adiciona ao PATH e cria um atalho .desktop com a sua configuração e ícone personalizado.",s1:"1. Atalho e versão",s1h:"O nome vira o título e o arquivo .desktop (ex.: “Meu Celular” → meu-celular.desktop).",s2:"2. Conexão",s3:"3. Vídeo e janela",s4:"4. Áudio",s5:"5. Controle / input",s6:"6. Gravação, câmera e display virtual",s7:"7. Ícone do atalho",s8:"Comando pronto — copie e cole no terminal"},
- en:{gen:"— command generator",sub:"Configure scrcpy with the form. At the end, a copyable command installs scrcpy from the official repo, adds it to PATH and creates a .desktop shortcut with your settings and custom icon.",s1:"1. Shortcut & version",s1h:"The name becomes the .desktop title and file (e.g. “My Phone” → my-phone.desktop).",s2:"2. Connection",s3:"3. Video & window",s4:"4. Audio",s5:"5. Control / input",s6:"6. Recording, camera & virtual display",s7:"7. Shortcut icon",s8:"Ready command — copy & paste into a terminal"},
- es:{gen:"— generador de comandos",sub:"Configure scrcpy con el formulario. Al final, un comando copiable instala scrcpy desde el repo oficial, lo añade al PATH y crea un acceso .desktop con su configuración e icono personalizado.",s1:"1. Acceso y versión",s1h:"El nombre será el título y el archivo .desktop (ej.: “Mi Teléfono” → mi-teléfono.desktop).",s2:"2. Conexión",s3:"3. Video y ventana",s4:"4. Audio",s5:"5. Control / entrada",s6:"6. Grabación, cámara y pantalla virtual",s7:"7. Icono del acceso",s8:"Comando listo — copie y pegue en la terminal"}
+en:{gen:"— command generator",sub:"Configure scrcpy with the form. At the end, a copyable command installs scrcpy from the official repo, adds it to PATH and creates a .desktop shortcut with your settings and custom icon.",
+s1:"1. Shortcut & version",s1h:"The name becomes the .desktop title and file (e.g. “My Phone” → my-phone.desktop).",
+s2:"2. Connection",h2:"USB by default. Fill serial/TCP-IP only if needed.",
+s3:"3. Video & window",h3:"Tip:",h3b:"greatly improves performance.",
+s4:"4. Audio",h4:"Android 11+ for audio forwarding.",
+s5:"5. Control / input",s6:"6. Recording, camera & virtual display",s7:"7. Shortcut icon",h7:"Base:",h7b:"official. Colors are applied at download by the installer.",s8:"Ready command — copy & paste into a terminal",
+f_name:"Config name",f_ver:"scrcpy version",o_latest:"latest (default)",o_custom:"custom…",f_tag:"Custom tag",
+f_serial:"Serial",f_usb:"USB",h_usb:"Force USB device",f_e:"TCP/IP",h_e:"Force TCP/IP device",f_tcpip:"TCP/IP",h_tcpip:"Empty + checked = auto-detect",f_tcpipf:"Enable",h_tcpipf:"No value: detects USB IP",f_port:"Port",h_port:"Default 27183:27199",
+f_maxsize:"Max size (px)",f_bitrate:"Bit-rate",f_maxfps:"Max FPS",f_codec:"Codec",o_defh264:"default (h264)",f_encoder:"Encoder",f_vsource:"Source",o_cam12:"camera (Android 12+)",f_dispid:"Display id",f_capor:"Capture",o_def0:"0 (default)",o_lock:"@90 (lock)",o_lockinit:"@ (lock initial)",f_crop:"Crop",f_novideo:"No video",f_fs:"Fullscreen",f_nowin:"No window",f_ontop:"Always on top",f_borderless:"Borderless",f_wintitle:"Title",f_winw:"Width",f_winh:"Height",f_ssaver:"Disable screensaver",f_fps:"Show FPS",
+f_noaudio:"No audio",f_acodec:"Codec",o_defopus:"default (opus)",f_abitrate:"Bit-rate",f_asource:"Source",o_defoutput:"default (output)",f_audiodup:"Duplicate on device",h_audiodup:"Requires source = playback",f_abuffer:"Buffer (ms)",
+f_nocontrol:"Read-only",f_keyboard:"Keyboard",f_flagk:"Physical keyboard",h_flagk:"uhid (or aoa with OTG)",f_mouse:"Mouse",f_flagm:"Physical mouse",f_gamepad:"Gamepad",f_flagg:"Gamepad",f_prefertext:"Prefer text",h_sdkonly:"Only with keyboard=sdk",f_rawkeys:"Raw keys",h_sdkonly2:"Only with keyboard=sdk",f_nokeyrepeat:"No repeat",f_legacypaste:"Legacy paste",f_noclipsync:"No clipboard sync",f_shortcutmod:"Shortcut mod",f_pushtarget:"Push target",
+f_record:"Record to",f_recordfmt:"Format",o_autoext:"auto (from extension)",f_camfacing:"Camera",o_any:"any",f_camsize:"Camera size",f_camfps:"Camera FPS",f_newdisplay:"New display",f_startapp:"Start app",sum_adv:"Advanced: OTG / power / v4",
+f_otg:"OTG mode",h_otg:"USB, no mirroring",f_stayawake:"Stay awake",f_screenoff:"Screen off",f_showtouches:"Show touches",f_poweroff:"Power off on close",f_timelimit:"Limit (s)",f_flex:"Flex display",tag_v4:"(v4+)",f_renderfit:"Fit",tag_v42:"(v4+)",f_keepactive:"Keep active",tag_v43:"(v4+)",f_bgcolor:"Window background",tag_v44:"(v4+)",f_camtorch:"Torch",tag_v45:"(v4+)",o_default:"default",
+f_iconbg:"Frame (background)",f_iconfg:"Body & antennas",f_iconscreen:"Lower screen",f_iconeyes:"Eyes / white",
+b_copy:"Copy command",b_desktop:"Download .desktop",b_sh:"Download .sh",h_dl:"The oneliner installs scrcpy and creates the shortcut. The .desktop is just the shortcut (for those who already have scrcpy) — save it to ~/.local/share/applications/.",sum_desktop:"Generated .desktop preview",
+s_about:"About scrcpy",p_about1:"Scrcpy (pronounced “screen copy”) is a free, open-source app that mirrors and controls Android devices over USB or TCP/IP — no root, nothing permanently installed on the device. Lightweight (native), 30–120 fps, 35–70 ms latency, 1080p+ quality and ~1 s startup. No account, no ads, no internet: works offline.",
+h_fps:"Frame rate",h_lat:"Latency",h_qual:"Quality",h_lic:"License (Genymobile)",p_about2:"Features: screen mirroring, audio (Android 11+), recording, camera (Android 12+), virtual display, two-way clipboard, physical keyboard/mouse/gamepad (HID), OTG mode and V4L2 webcam on Linux.",
+s_req:"Requirements & first steps",req1:"Android 5.0 (API 21)+; audio needs Android 11+, camera needs Android 12+.",req2:"Enable USB debugging (Settings → Developer options; tap “Build number” 7× if hidden) and authorize the RSA prompt on the device.",req3:"Install with the command above (it bundles adb if you lack one) and run: scrcpy. For Wi-Fi: adb connect IP:5555, then scrcpy.",
+s_faq:"FAQ",q1:"Is scrcpy free?",a1:"Yes — free and open source (Apache 2.0), no ads, no premium features, no account.",q2:"Does it need root?",a2:"No. Just enable USB debugging in Developer options.",q3:"Does it work wirelessly?",a3:"Yes, over TCP/IP after a first USB setup to enable wireless debugging.",q4:"Does it install anything on the phone?",a4:"It pushes a temporary server while running; nothing permanent remains after closing.",q5:"Why is there no audio?",a5:"Audio forwarding requires Android 11 or higher.",q6:"Can I mirror multiple devices?",a6:"Yes — one scrcpy instance per device (use --serial to pick).",
+s_legal:"Legal notices",sum_disclaimer:"Disclaimer",p_disclaimer:"Informational content only, no warranties. This page is not affiliated with, endorsed or sponsored by Genymobile — for official info see github.com/Genymobile/scrcpy. Scrcpy is Apache 2.0: use at your own risk, respecting applicable laws and third-party privacy. We are not liable for damages from using this site or the software.",
+sum_privacy:"Privacy",p_privacy:"This generator runs 100% in your browser: no form data is sent to any server (state lives only in the URL #hash, locally). No registration, no first-party cookies, no analytics. External links (GitHub) follow those sites’ policies.",
+sum_terms:"Terms of use",p_terms:"By using this page you agree to use the information at your own risk, follow applicable laws and the software license terms (scrcpy’s Apache 2.0; this repo’s installer is MIT). Content is educational and may change without notice.",
+f_footer:"scrcpy-installer · scrcpy is Apache-2.0 © Genymobile · MIT installer · no official affiliation ·",
+v_excl:"--prefer-text and --raw-key-events are mutually exclusive.",v_sdk:"--prefer-text/--raw-key-events require --keyboard=sdk.",v_mouse:"--mouse=sdk needs video playback (uncheck --no-video or use uhid).",v_dup:"--audio-dup requires --audio-source=playback.",v_cam:"Camera options need source = camera (auto-applied).",v_v4:"Checked flags (v4+) require scrcpy v4 or newer.",v_otg:"--otg disables mirroring; conflicts with camera source.",copied:"Copied!"},
+es:{gen:"— generador de comandos",sub:"Configure scrcpy con el formulario. Al final, un comando copiable instala scrcpy desde el repo oficial, lo añade al PATH y crea un acceso .desktop con su configuración e icono personalizado.",
+s1:"1. Acceso y versión",s1h:"El nombre será el título y el archivo .desktop (ej.: “Mi Teléfono” → mi-teléfono.desktop).",
+s2:"2. Conexión",h2:"USB por defecto. Complete serial/TCP-IP solo si lo necesita.",
+s3:"3. Video y ventana",h3:"Consejo:",h3b:"mejora mucho el rendimiento.",
+s4:"4. Audio",h4:"Android 11+ para reenvío de audio.",
+s5:"5. Control / entrada",s6:"6. Grabación, cámara y pantalla virtual",s7:"7. Icono del acceso",h7:"Base:",h7b:"oficial. Los colores se aplican al descargar con el instalador.",s8:"Comando listo — copie y pegue en la terminal",
+f_name:"Nombre de la config",f_ver:"Versión de scrcpy",o_latest:"latest (defecto)",o_custom:"custom…",f_tag:"Etiqueta custom",
+f_serial:"Serial",f_usb:"USB",h_usb:"Forzar dispositivo USB",f_e:"TCP/IP",h_e:"Forzar dispositivo TCP/IP",f_tcpip:"TCP/IP",h_tcpip:"Vacío + marcado = autodetección",f_tcpipf:"Activar",h_tcpipf:"Sin valor: detecta IP del USB",f_port:"Puerto",h_port:"Defecto 27183:27199",
+f_maxsize:"Tamaño máx (px)",f_bitrate:"Bit-rate",f_maxfps:"FPS máx",f_codec:"Códec",o_defh264:"defecto (h264)",f_encoder:"Encoder",f_vsource:"Fuente",o_cam12:"cámara (Android 12+)",f_dispid:"Display id",f_capor:"Captura",o_def0:"0 (defecto)",o_lock:"@90 (fijar)",o_lockinit:"@ (fijar inicial)",f_crop:"Recorte",f_novideo:"Sin video",f_fs:"Pantalla completa",f_nowin:"Sin ventana",f_ontop:"Siempre encima",f_borderless:"Sin bordes",f_wintitle:"Título",f_winw:"Ancho",f_winh:"Alto",f_ssaver:"Desactivar salvapantallas",f_fps:"Mostrar FPS",
+f_noaudio:"Sin audio",f_acodec:"Códec",o_defopus:"defecto (opus)",f_abitrate:"Bit-rate",f_asource:"Fuente",o_defoutput:"defecto (output)",f_audiodup:"Duplicar en el dispositivo",h_audiodup:"Requiere fuente = playback",f_abuffer:"Búfer (ms)",
+f_nocontrol:"Solo lectura",f_keyboard:"Teclado",f_flagk:"Teclado físico",h_flagk:"uhid (o aoa con OTG)",f_mouse:"Ratón",f_flagm:"Ratón físico",f_gamepad:"Gamepad",f_flagg:"Gamepad",f_prefertext:"Preferir texto",h_sdkonly:"Solo con keyboard=sdk",f_rawkeys:"Raw keys",h_sdkonly2:"Solo con keyboard=sdk",f_nokeyrepeat:"Sin repetición",f_legacypaste:"Pegado legado",f_noclipsync:"Sin sync portapapeles",f_shortcutmod:"Mod atajos",f_pushtarget:"Destino push",
+f_record:"Grabar en",f_recordfmt:"Formato",o_autoext:"auto (por extensión)",f_camfacing:"Cámara",o_any:"cualquiera",f_camsize:"Tam. cámara",f_camfps:"FPS cámara",f_newdisplay:"Nueva pantalla",f_startapp:"Iniciar app",sum_adv:"Avanzado: OTG / energía / v4",
+f_otg:"Modo OTG",h_otg:"USB, sin espejado",f_stayawake:"Mantener encendido",f_screenoff:"Pantalla off",f_showtouches:"Mostrar toques",f_poweroff:"Apagar al cerrar",f_timelimit:"Límite (s)",f_flex:"Flex display",tag_v4:"(v4+)",f_renderfit:"Ajuste",tag_v42:"(v4+)",f_keepactive:"Mantener activo",tag_v43:"(v4+)",f_bgcolor:"Fondo ventana",tag_v44:"(v4+)",f_camtorch:"Flash",tag_v45:"(v4+)",o_default:"defecto",
+f_iconbg:"Marco (fondo)",f_iconfg:"Cuerpo y antenas",f_iconscreen:"Pantalla inferior",f_iconeyes:"Ojos / blanco",
+b_copy:"Copiar comando",b_desktop:"Descargar .desktop",b_sh:"Descargar .sh",h_dl:"El oneliner instala scrcpy y crea el acceso. El .desktop es solo el acceso (para quien ya tiene scrcpy) — guárdelo en ~/.local/share/applications/.",sum_desktop:"Vista previa del .desktop generado",
+s_about:"Acerca de scrcpy",p_about1:"Scrcpy (se pronuncia “screen copy”) es una app gratuita y open source que espeja y controla Android por USB o TCP/IP — sin root y sin instalar nada permanente en el aparato. Ligera (nativa), 30–120 fps, latencia 35–70 ms, calidad 1080p+ e inicio en ~1 s. Sin cuenta, sin anuncios y sin internet: funciona offline.",
+h_fps:"Cuadros por segundo",h_lat:"Latencia",h_qual:"Calidad",h_lic:"Licencia (Genymobile)",p_about2:"Funciones: espejado de pantalla, audio (Android 11+), grabación, cámara (Android 12+), pantalla virtual, portapapeles bidireccional, teclado/ratón/gamepad físicos (HID), modo OTG y webcam V4L2 en Linux.",
+s_req:"Requisitos y primeros pasos",req1:"Android 5.0 (API 21)+; audio exige Android 11+, cámara exige Android 12+.",req2:"Active la depuración USB (Ajustes → Opciones de desarrollador; toque 7× “Número de compilación” si está oculto) y autorice el RSA en el aparato.",req3:"Instale con el comando de arriba (incluye adb si no tiene uno) y ejecute: scrcpy. Para Wi-Fi: adb connect IP:5555 y luego scrcpy.",
+s_faq:"Preguntas frecuentes",q1:"¿Scrcpy es gratis?",a1:"Sí — gratis y open source (Apache 2.0), sin anuncios, sin funciones premium y sin cuenta.",q2:"¿Necesita root?",a2:"No. Basta activar la depuración USB en Opciones de desarrollador.",q3:"¿Funciona sin cables?",a3:"Sí, por TCP/IP tras una primera configuración por USB para activar la depuración inalámbrica.",q4:"¿Instala algo en el teléfono?",a4:"Sube un servidor temporal durante el uso; nada permanente queda al cerrar.",q5:"¿Por qué no hay audio?",a5:"El reenvío de audio exige Android 11 o superior.",q6:"¿Puedo espejar varios aparatos?",a6:"Sí — una instancia de scrcpy por dispositivo (use --serial para elegir).",
+s_legal:"Avisos legales",sum_disclaimer:"Descargo",p_disclaimer:"Contenido solo informativo, sin garantías. Esta página no está afiliada, respaldada ni patrocinada por Genymobile — para información oficial vea github.com/Genymobile/scrcpy. Scrcpy es Apache 2.0: úselo bajo su riesgo, respetando leyes aplicables y la privacidad de terceros. No nos responsabilizamos por daños del uso del sitio o del software.",
+sum_privacy:"Privacidad",p_privacy:"Este generador corre 100% en su navegador: ningún dato del formulario se envía a servidores (el estado vive solo en el #hash de la URL, local). Sin registro, sin cookies propias, sin analytics. Los enlaces externos (GitHub) siguen las políticas de esos sitios.",
+sum_terms:"Términos de uso",p_terms:"Al usar esta página acepta usar la información bajo su riesgo, seguir las leyes aplicables y los términos de la licencia (Apache 2.0 de scrcpy; el instalador de este repo es MIT). El contenido es educativo y puede cambiar sin aviso.",
+f_footer:"scrcpy-installer · scrcpy es Apache-2.0 © Genymobile · instalador MIT · sin afiliación oficial ·",
+v_excl:"--prefer-text y --raw-key-events son mutuamente excluyentes.",v_sdk:"--prefer-text/--raw-key-events exigen --keyboard=sdk.",v_mouse:"--mouse=sdk necesita reproducción de video (desmarque --no-video o use uhid).",v_dup:"--audio-dup exige --audio-source=playback.",v_cam:"Las opciones de cámara exigen fuente = camera (auto-aplicado).",v_v4:"Las flags marcadas (v4+) exigen scrcpy v4 o superior.",v_otg:"--otg desactiva el espejado; conflita con fuente cámara.",copied:"¡Copiado!"}
 };
-function autoLang(){var l=(navigator.language||"pt").slice(0,2);return I18N[l]?l:"pt";}
-function applyLang(l){var d=I18N[l]||I18N.pt;document.querySelectorAll("[data-i18n]").forEach(function(el){var k=el.getAttribute("data-i18n");if(d[k])el.textContent=d[k];});document.documentElement.lang=l==="pt"?"pt-BR":l;}
+function autoLang(){var l=(navigator.language||"pt").slice(0,2);if(!I18N[l])l="pt";try{var s=localStorage.getItem("scrcpy-gen-lang");if(s&&(I18N[s]||s==="pt"))l=s;}catch(e){}return l;}
+function applyLang(l){LANG=l;var d=I18N[l]||{};document.querySelectorAll("[data-i18n]").forEach(function(el){if(el.dataset.orig===undefined)el.dataset.orig=el.innerHTML;var k=el.getAttribute("data-i18n");el.innerHTML=(l==="pt"||!d[k])?el.dataset.orig:d[k];});document.documentElement.lang=l==="pt"?"pt-BR":l;try{localStorage.setItem("scrcpy-gen-lang",l);}catch(e){}update();}
 function slugify(s){return (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[ _]+/g,"-").replace(/[^a-z0-9-]/g,"").replace(/-{2,}/g,"-").replace(/^-|-$/g,"")||"scrcpy";}
 function shSingle(s){return "'"+String(s).replace(/'/g,"'\\''")+"'";}
 function quoteArg(v){return /[^A-Za-z0-9_@%+=:,./-]/.test(v)?'"'+v.replace(/(["\\$`])/g,"\\$1")+'"':v;}
@@ -302,15 +414,17 @@ function buildArgs(){
   if(checked("camTorch"))a.push("--camera-torch");
   return a.join(" ");
 }
+function T(k){var d=I18N[LANG]||{};return d[k]||PT[k]||k;}
+var PT={v_excl:"--prefer-text e --raw-key-events são mutuamente exclusivos.",v_sdk:"--prefer-text/--raw-key-events exigem --keyboard=sdk.",v_mouse:"--mouse=sdk requer playback de vídeo (desmarque --no-video ou use uhid).",v_dup:"--audio-dup exige --audio-source=playback.",v_cam:"Opções de câmera exigem fonte = camera (aplicado automaticamente).",v_v4:"Flags marcadas (v4+) exigem scrcpy v4 ou superior.",v_otg:"--otg desabilita espelhamento; conflita com fonte camera.",copied:"Copiado!",b_copy:"Copiar comando"};
 function validate(){
   var w=[];
-  if(checked("preferText")&&checked("rawKeys"))w.push(["err","--prefer-text e --raw-key-events são mutuamente exclusivos."]);
-  if((checked("preferText")||checked("rawKeys"))&&val("keyboard")!=="sdk")w.push(["warn","--prefer-text/--raw-key-events exigem --keyboard=sdk."]);
-  if(val("mouse")==="sdk"&&checked("noVideo"))w.push(["warn","--mouse=sdk requer playback de vídeo (desmarque --no-video ou use uhid)."]);
-  if(checked("audioDup")&&val("asource")!=="playback")w.push(["err","--audio-dup exige --audio-source=playback."]);
-  if((val("camSize")||val("camFps")||val("camFacing"))&&val("vsource")!=="camera"&&!val("camFacing"))w.push(["warn","Opções de câmera exigem fonte = camera (aplicado automaticamente)."]);
-  if(checked("flex")||val("renderFit")||checked("keepActive")||val("bgColor")||checked("camTorch"))w.push(["warn","Flags marcadas (v4+) exigem scrcpy v4 ou superior."]);
-  if(checked("otg")&&val("vsource")==="camera")w.push(["warn","--otg desabilita espelhamento; conflita com fonte camera."]);
+  if(checked("preferText")&&checked("rawKeys"))w.push(["err",T("v_excl")]);
+  if((checked("preferText")||checked("rawKeys"))&&val("keyboard")!=="sdk")w.push(["warn",T("v_sdk")]);
+  if(val("mouse")==="sdk"&&checked("noVideo"))w.push(["warn",T("v_mouse")]);
+  if(checked("audioDup")&&val("asource")!=="playback")w.push(["err",T("v_dup")]);
+  if((val("camSize")||val("camFps")||val("camFacing"))&&val("vsource")!=="camera"&&!val("camFacing"))w.push(["warn",T("v_cam")]);
+  if(checked("flex")||val("renderFit")||checked("keepActive")||val("bgColor")||checked("camTorch"))w.push(["warn",T("v_v4")]);
+  if(checked("otg")&&val("vsource")==="camera")w.push(["warn",T("v_otg")]);
   return w;
 }
 function update(){
@@ -355,10 +469,15 @@ document.addEventListener("input",function(e){
 document.addEventListener("change",function(){$("customVerWrap").hidden=$("scrVersion").value!=="custom";update();});
 $("copyBtn").addEventListener("click",function(){
   var t=$("oneliner").textContent;
-  function ok(){var b=$("copyBtn");b.textContent="Copiado!";setTimeout(function(){b.textContent="Copiar comando";},1500);}
+  function ok(){var b=$("copyBtn");var prev=b.textContent;b.textContent=T("copied");setTimeout(function(){b.textContent=prev;},1500);}
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,fallback);
   else fallback();
   function fallback(){var ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");ok();}catch(e){}document.body.removeChild(ta);}
+});
+function downloadFile(name,content,type){var blob=new Blob([content],{type:type});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},2000);}
+$("dlDesktopBtn").addEventListener("click",function(){
+  var slug=(function(){var s=(val("shortcutName")||"scrcpy");return slugify(s);})();
+  downloadFile(slug+".desktop",$("desktopPrev").textContent+"\n","text/plain");
 });
 $("dlBtn").addEventListener("click",function(){
   var blob=new Blob(["#!/usr/bin/env bash\n"+$("oneliner").textContent.replace(/^curl.*\|\s*bash -s --\s*/,"bash install.sh ")+"\n"],{type:"text/x-sh"});

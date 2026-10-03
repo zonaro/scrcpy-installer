@@ -1,0 +1,68 @@
+# scrcpy-installer — generator page
+
+> Configure scrcpy via a web form and get a copyable oneliner that installs
+> scrcpy from the official Genymobile releases and creates a Linux `.desktop`
+> shortcut with your settings and a recolored SVG icon.
+
+- Page: https://zonaro.github.io/scrcpy-installer/
+- Repo: https://github.com/zonaro/scrcpy-installer
+- Installer: https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/install.sh
+- Languages: pt-BR (default), en, es — persisted in localStorage, auto-detected
+- Privacy: the form runs 100% client-side (vanilla JS, no CDN, no analytics).
+  State is serialized only into the URL #hash locally. No data leaves the browser.
+
+## What the oneliner does
+
+`curl -fsSL <installer> | bash -s -- --shortcut-name 'Name'
+--scrcpy-args '<scrcpy flags>' [--version <tag>] [--icon-bg/fg/screen/eyes <#hex>]`
+
+1. Downloads the official prebuilt scrcpy (x86_64 glibc) or falls back to the
+   distro package manager (other archs / musl).
+2. Verifies SHA256 against the official SHA256SUMS.txt.
+3. Installs to ~/.local (or /usr/local as root) and ensures PATH.
+4. Downloads the official scrcpy.svg icon, recolors it
+   (bg #077063, body/antennas #30dd81, screen #e4e4e4, eyes #ffffff by default).
+5. Writes ~/.local/share/applications/<slug>.desktop with Exec=scrcpy <flags>.
+
+Alternative output: download the `.desktop` file directly (for users who
+already have scrcpy installed) and save it to ~/.local/share/applications/.
+
+## Supported scrcpy options (v3.3.4 + v4 delta)
+
+Connection: --serial, --select-usb/-d, --select-tcpip/-e, --tcpip, --port/-p.
+Video: --max-size/-m, --video-bit-rate/-b, --max-fps, --video-codec
+(h264|h265|av1), --video-encoder, --video-source (display|camera),
+--display-id, --capture-orientation, --crop, --no-video.
+Window: --fullscreen/-f, --no-window, --always-on-top, --window-borderless,
+--window-title, --window-width/--window-height, --disable-screensaver, --print-fps.
+Audio: --no-audio, --audio-codec (opus|aac|flac|raw), --audio-bit-rate,
+--audio-source (output|playback|mic|mic-unprocessed|mic-camcorder|
+mic-voice-recognition|mic-voice-communication|voice-call|voice-call-uplink|
+voice-call-downlink|voice-performance), --audio-dup, --audio-buffer.
+Input: --no-control/-n, --keyboard, --mouse, --gamepad (+ -K/-M/-G shorthands),
+--prefer-text, --raw-key-events, --no-key-repeat, --legacy-paste,
+--no-clipboard-autosync, --shortcut-mod, --push-target.
+Recording/camera/virtual display: --record/-r, --record-format,
+--camera-facing/size/fps, --new-display, --start-app.
+Device: --otg, --stay-awake/-w, --turn-screen-off/-S, --show-touches/-t,
+--power-off-on-close, --time-limit.
+v4-only: --flex-display/-x, --render-fit, --keep-active, --background-color,
+--camera-torch.
+
+Validation rules enforced with warnings: --prefer-text XOR --raw-key-events
+(sdk keyboard only); --mouse=sdk needs video playback; --audio-dup needs
+--audio-source=playback; camera options auto-enable --video-source=camera.
+
+## About scrcpy (summary of scrcpy.dev)
+
+Free, open-source Android screen mirroring and control (Apache 2.0,
+Genymobile). No root, no account, no ads, works offline over USB or TCP/IP.
+30–120 fps, 35–70 ms latency, 1080p+, ~1 s startup. Audio needs Android 11+,
+camera needs Android 12+. Minimum device: Android 5.0 (API 21) with USB
+debugging enabled.
+
+## Legal (summary)
+
+Unofficial page, no affiliation with Genymobile. Informational content only,
+no warranties, use at your own risk. No data collection on this page.
+scrcpy is Apache 2.0; the installer script is MIT.
