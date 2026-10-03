@@ -18,7 +18,7 @@
 #   --version <tag>   Install a specific release tag (default: latest)
 #   --prefix <dir>    Install prefix (default: ~/.local or /usr/local when root)
 #   --system          Install system-wide into /usr/local (requires root/sudo)
-#   --force           Reinstall even if the version is already installed
+#   --force           Update/reinstall without asking, even if a version is already installed
 #   --no-deps         Skip automatic dependency installation
 #   --no-checksum     Skip SHA256 verification of the downloaded archive
 #   --uninstall       Remove the scrcpy installed by this script
@@ -337,11 +337,52 @@ fi
 ASSET_NAME="${ASSET_URL##*/}"
 INSTALL_DIR="$LIB_DIR/$VERSION"
 
-# ---------------------------------------------------------------- up-to-date check
-if [ "$FORCE" -eq 0 ] && [ -f "$LIB_DIR/VERSION" ] && [ "$(cat "$LIB_DIR/VERSION")" = "$VERSION" ] \
-    && [ -x "$BIN_DIR/scrcpy" ]; then
-    info "scrcpy $VERSION is already installed ($BIN_DIR/scrcpy) — nothing to do. Use --force to reinstall."
-    exit 0
+# ---------------------------------------------------------------- installed state
+INSTALLED_VERSION=""
+[ -f "$LIB_DIR/VERSION" ] && INSTALLED_VERSION="$(cat "$LIB_DIR/VERSION")"
+
+# always (re)create the scrcpy/adb bin shortcuts, even when nothing new is installed
+refresh_shortcut() {
+    [ -d "$BIN_DIR" ] || run_priv install -d "$BIN_DIR"
+    run_priv ln -sfn "$INSTALL_DIR/scrcpy" "$BIN_DIR/scrcpy"
+    if ! command -v adb >/dev/null 2>&1 && [ -x "$INSTALL_DIR/adb" ]; then
+        run_priv ln -sfn "$INSTALL_DIR/adb" "$BIN_DIR/adb"
+        info "no system adb found — installed the adb bundled with scrcpy ($BIN_DIR/adb)"
+    fi
+}
+
+# ---------------------------------------------------------------- up-to-date: refresh shortcuts only
+if [ -n "$INSTALLED_VERSION" ] && [ "$INSTALLED_VERSION" = "$VERSION" ] && [ -d "$LIB_DIR/$VERSION" ]; then
+    refresh_shortcut
+    if [ "$FORCE" -eq 0 ]; then
+        info "scrcpy $VERSION is already installed — recreated the 'scrcpy' command shortcut. Use --force to reinstall."
+        if [ -n "$SHORTCUT_NAME" ]; then
+            TMP_DIR="$(mktemp -d)"
+            create_shortcut
+        fi
+        exit 0
+    fi
+fi
+
+# ---------------------------------------------------------------- update confirmation
+if [ -n "$INSTALLED_VERSION" ] && [ "$INSTALLED_VERSION" != "$VERSION" ] && [ "$FORCE" -eq 0 ]; then
+    if [ -t 0 ]; then
+        printf "${C_CYAN}[scrcpy]${C_RESET} scrcpy %s is installed. Install %s instead? [Y/n] " "$INSTALLED_VERSION" "$VERSION"
+        read -r REPLY || REPLY=""
+        case "$REPLY" in
+            ""|y|Y|yes|Yes|YES|s|S|sim|Sim|SIM) ;;
+            *)
+                info "cancelled — keeping scrcpy $INSTALLED_VERSION (use --force to update without asking)"
+                if [ -n "$SHORTCUT_NAME" ]; then
+                    TMP_DIR="$(mktemp -d)"
+                    create_shortcut
+                fi
+                exit 0
+                ;;
+        esac
+    else
+        warn "scrcpy $INSTALLED_VERSION is installed; stdin is not a terminal, updating to $VERSION automatically (use --force to skip the prompt)"
+    fi
 fi
 
 # ---------------------------------------------------------------- dependencies (best effort)
@@ -392,13 +433,7 @@ if [ -f "$INSTALL_DIR/scrcpy.1" ]; then
 fi
 
 # ---------------------------------------------------------------- symlinks
-run_priv ln -sfn "$INSTALL_DIR/scrcpy" "$BIN_DIR/scrcpy"
-
-# if no system adb exists, expose the adb bundled with the official package
-if ! command -v adb >/dev/null 2>&1 && [ -x "$INSTALL_DIR/adb" ]; then
-    run_priv ln -sfn "$INSTALL_DIR/adb" "$BIN_DIR/adb"
-    info "no system adb found — installed the adb bundled with scrcpy ($BIN_DIR/adb)"
-fi
+refresh_shortcut
 
 # ---------------------------------------------------------------- cleanup old version
 OLD_VERSION=""

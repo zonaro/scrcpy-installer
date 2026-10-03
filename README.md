@@ -5,7 +5,9 @@ Install or update [scrcpy](https://github.com/Genymobile/scrcpy) on any Linux di
 - Pulls the **latest** release automatically (or a specific version with `--version`)
 - Uses the official **prebuilt x86_64 binary** (glibc) when available; falls back to your distribution's package manager on other architectures or musl systems (Alpine)
 - Verifies the download with the official **SHA256** checksums
-- **Idempotent**: re-running the command updates scrcpy to the newest release
+- **Idempotent**: re-running the command updates scrcpy to the newest release (asks for confirmation first when an older version is installed; `--force` skips the prompt)
+- The `scrcpy` command shortcut is **always recreated**, even when the version is already up to date
+- Optional **desktop shortcuts** (`.desktop` + custom SVG icon) per device, with baked-in `scrcpy` arguments
 - Installs `scrcpy` (and a bundled `adb` when you don't have one) so it works from anywhere in your terminal
 - Can be run as a **normal user** (installs to `~/.local`) or **system-wide** (installs to `/usr/local`)
 
@@ -23,6 +25,8 @@ That's it. `scrcpy` ends up in `~/.local/bin` (added to your PATH in `~/.bashrc`
 scrcpy --version
 ```
 
+If a version is already installed, you'll be asked for confirmation before updating (when running interactively). When piped (non-TTY), it updates automatically. Pass `--force` to skip the prompt entirely. The `scrcpy` command shortcut is recreated on every run, even when nothing new is installed.
+
 > To install system-wide instead (into `/usr/local`), prefix with `sudo`:
 >
 > ```bash
@@ -33,7 +37,7 @@ scrcpy --version
 
 ## Update
 
-Just run the same command again — it detects the installed version and upgrades scrcpy to the latest release:
+Just run the same command again — it detects the installed version and upgrades scrcpy to the latest release. In an interactive terminal you'll be asked to confirm the update (`Y/n`, Enter accepts); when piped it proceeds automatically:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/install.sh | bash
@@ -43,6 +47,33 @@ Or, if you installed with `sudo`:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/install.sh | sudo bash
+```
+
+To update without being asked:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/install.sh | bash -s -- --force
+```
+
+---
+
+## Desktop shortcut
+
+Create a launcher entry with a custom name, baked-in arguments and a recolored icon — handy when you have more than one phone:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/install.sh | bash -s -- --shortcut-name "Meu Celular" --scrcpy-args "--max-size 1024 --no-audio"
+```
+
+The shortcut is (re)written on every run of the installer, even when scrcpy itself is already up to date. Re-running with different colors or args updates the existing shortcut in place.
+
+Icon colors are taken from the official scrcpy SVG and can be overridden:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/install.sh | bash -s -- \
+  --shortcut-name "Work Phone" \
+  --scrcpy-args "--max-size 1024" \
+  --icon-bg "#0a3d62" --icon-fg "#60a3bc" --icon-screen "#f6e58d" --icon-eyes "#dfe6e9"
 ```
 
 ---
@@ -79,10 +110,18 @@ See `scrcpy --help` for all options (crop, recording, audio, OTG mode, ...).
 | `--version <tag>` | Install a specific release (e.g. `--version v3.3.4`); default is `latest` |
 | `--prefix <dir>` | Install into a custom prefix (default: `~/.local`, or `/usr/local` when root) |
 | `--system` | Install system-wide into `/usr/local` (equivalent to running as root) |
-| `--force` | Reinstall even if that version is already installed |
+| `--force` | Update/reinstall without asking, even if scrcpy is already installed |
 | `--no-deps` | Skip automatic dependency installation |
 | `--no-checksum` | Skip SHA256 verification of the downloaded archive |
 | `--uninstall` | Remove the scrcpy installed by this script |
+| `--shortcut-name <name>` | Create/recreate a `.desktop` shortcut with this name |
+| `--scrcpy-args "<args>"` | Arguments baked into the shortcut's `Exec=` line |
+| `--icon-bg <hex>` | Recolor the icon background frame (default `#077063`) |
+| `--icon-fg <hex>` | Recolor the icon body/antennas (default `#30dd81`) |
+| `--icon-screen <hex>` | Recolor the icon lower screen (default `#e4e4e4`) |
+| `--icon-eyes <hex>` | Recolor the icon eyes/white parts (default `#ffffff`) |
+| `--icon-url <url>` | Custom SVG icon source (default: official `scrcpy.svg`) |
+| `--shortcut-only` | Only create the shortcut, skip (re)installation (requires `--shortcut-name`) |
 
 Example with options:
 
