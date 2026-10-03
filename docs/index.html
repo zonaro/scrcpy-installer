@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scrcpy Installer — gerador de comando oneliner e atalho (.desktop / .lnk)</title>
-<meta name="description" content="Configure o scrcpy por formulário (espelhamento Android via USB ou TCP/IP) e gere um comando oneliner que instala do repositório oficial e cria um atalho (.desktop no Linux, .bat + .lnk no Windows) com ícone personalizado. PT-BR, EN e ES.">
+<meta name="description" content="Configure o scrcpy por formulário (espelhamento Android via USB ou TCP/IP) e gere um comando oneliner que instala do repositório oficial e cria um atalho (.desktop no Linux, .lnk no Windows) com ícone personalizado. PT-BR, EN e ES.">
 <meta name="keywords" content="scrcpy, android, screen mirroring, espelhar tela android, scrcpy gui, scrcpy config, .desktop, linux, usb debugging, tcpip, Genymobile">
 <meta name="author" content="scrcpy-installer">
 <meta name="robots" content="index, follow">
@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="scrcpy-installer">
 <meta property="og:title" content="Scrcpy Installer — gerador de comando oneliner e atalho (.desktop / .lnk)">
-<meta property="og:description" content="Formulário que gera comando de instalação do scrcpy + atalho (.desktop no Linux, .bat + .lnk no Windows) com a sua configuração e ícone personalizado.">
+<meta property="og:description" content="Formulário que gera comando de instalação do scrcpy + atalho (.desktop no Linux, .lnk no Windows) com a sua configuração e ícone personalizado.">
 <meta property="og:url" content="https://zonaro.github.io/scrcpy-installer/">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:locale:alternate" content="en_US">
@@ -22,7 +22,7 @@
 <meta name="twitter:description" content="Configure o scrcpy pelo formulário e gere um oneliner + atalho (.desktop / .lnk).">
 <meta name="theme-color" content="#077063">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebApplication","name":"Scrcpy Installer — gerador de comando","url":"https://zonaro.github.io/scrcpy-installer/","applicationCategory":"UtilitiesApplication","operatingSystem":["Linux","Windows"],"inLanguage":["pt-BR","en","es"],"description":"Formulário que gera um comando oneliner para instalar o scrcpy do repositório oficial e criar um atalho (.desktop no Linux, .bat + .lnk no Windows) com a configuração escolhida e ícone personalizado.","offers":{"@type":"Offer","price":"0"},"license":"https://opensource.org/licenses/MIT","author":{"@type":"Organization","name":"scrcpy-installer"},"isBasedOn":"https://github.com/Genymobile/scrcpy"}
+{"@context":"https://schema.org","@type":"WebApplication","name":"Scrcpy Installer — gerador de comando","url":"https://zonaro.github.io/scrcpy-installer/","applicationCategory":"UtilitiesApplication","operatingSystem":["Linux","Windows"],"inLanguage":["pt-BR","en","es"],"description":"Formulário que gera um comando oneliner para instalar o scrcpy do repositório oficial e criar um atalho (.desktop no Linux, .lnk no Windows) com a configuração escolhida e ícone personalizado.","offers":{"@type":"Offer","price":"0"},"license":"https://opensource.org/licenses/MIT","author":{"@type":"Organization","name":"scrcpy-installer"},"isBasedOn":"https://github.com/Genymobile/scrcpy"}
 </script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
@@ -84,6 +84,15 @@ button:hover{filter:brightness(1.1)}
 #warnings .err{color:var(--err)}
 .preview{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:center;margin-top:10px}
 .preview svg{width:110px;height:110px;background:#222;border-radius:12px}
+.icon-colorrow{display:flex;gap:8px;align-items:center}
+.icon-colorrow input[type=color]{flex:0 0 52px;width:52px;height:38px;border:1px solid var(--border);border-radius:6px;background:#0d1117;padding:2px;cursor:pointer}
+.icon-colorrow input[type=text]{flex:1;min-width:0;background:#0d1117;color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:7px 9px}
+.icon-name{color:var(--muted);font-size:.78rem;min-height:1.1em}
+.icon-name b{color:var(--fg);font-weight:600}
+.moodrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.moodrow input,.moodrow select{flex:1;min-width:180px;background:#0d1117;color:var(--fg);border:1px solid var(--border);border-radius:6px;padding:8px 10px}
+.moodrow button{flex:0 0 auto}
+#ntcWarn{color:var(--warn);font-size:.8rem;margin-top:8px;display:none}
 footer{text-align:center;color:var(--muted);padding:24px;font-size:.85rem}
 footer a{color:var(--accent)}
 @media(max-width:640px){.preview{grid-template-columns:1fr}header.hero h1{font-size:1.5rem}}
@@ -102,7 +111,7 @@ footer a{color:var(--accent)}
 <body>
 <header class="hero">
   <h1><svg class="hero-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Scrcpy Installer"><path fill="var(--icon-bg)" d="M 6,5 C 4.892,5 4,5.892 4,7 V 33 H 44 V 7 C 44,5.892 43.108,5 42,5 Z"/><path fill="none" stroke="var(--icon-fg)" stroke-width="3" stroke-linecap="round" d="M 15.2,21 11.5,15.5"/><path fill="none" stroke="var(--icon-fg)" stroke-width="3" stroke-linecap="round" d="M 32.8,21 36.5,15.5"/><path fill="var(--icon-fg)" d="m 24,17 c -8.356,0 -15.221,6.347 -16,14.461 C 7.929,33 9.554,33 9.554,33 H 38.406 c 0,0 1.672,0 1.591,-1.617 C 39.183,23.306 32.332,17 24,17 Z"/><path fill="var(--icon-screen)" d="m 4,33 v 2 c 0,1.108 0.892,2 2,2 h 36 c 1.108,0 2,-0.892 2,-2 v -2 z"/><circle fill="var(--icon-eyes)" cx="16" cy="26" r="2"/><circle fill="var(--icon-eyes)" cx="32" cy="26" r="2"/></svg>Scrcpy <span class="tint">Installer</span> <span data-i18n="gen">— gerador de comando</span></h1>
-  <p data-i18n="sub">Configure o scrcpy pelo formulário. No final, um comando copiável instala o scrcpy do repositório oficial, adiciona ao PATH e cria um atalho com a sua configuração e ícone personalizado (.desktop no Linux, .bat + .lnk no Windows).</p>
+  <p data-i18n="sub">Configure o scrcpy pelo formulário. No final, um comando copiável instala o scrcpy do repositório oficial, adiciona ao PATH e cria um atalho com a sua configuração e ícone personalizado (.desktop no Linux, .lnk no Windows).</p>
   <div class="links">
     <a href="https://github.com/Genymobile/scrcpy" target="_blank" rel="noopener">Genymobile/scrcpy</a>
     <a href="https://github.com/zonaro/scrcpy-installer" target="_blank" rel="noopener">zonaro/scrcpy-installer</a>
@@ -118,17 +127,24 @@ footer a{color:var(--accent)}
 <main>
   <section class="card" id="s-icon">
     <h2 data-i18n="s7">Ícone do atalho</h2>
-    <p class="hint"><span data-i18n="h7">Base:</span> <code>scrcpy.svg</code> <span data-i18n="h7b">oficial. As cores são aplicadas no download pelo instalador — e no tema desta página.</span></p>
+    <p class="hint"><span data-i18n="h7">Base:</span> <code>scrcpy.svg</code> <span data-i18n="h7b">oficial. As cores são aplicadas no download pelo instalador — e no tema desta página.</span> <span data-i18n="h7c">Digite um nome qualquer (“azul escuro”, “terracota”, “#ff00aa”) ou use o seletor. A base do suporte acompanha o Monitor automaticamente.</span></p>
     <div class="grid">
-      <div class="field"><label for="iconBg"><span data-i18n="f_iconbg">Moldura (fundo)</span></label><input type="color" id="iconBg" value="#077063"></div>
-      <div class="field"><label for="iconFg"><span data-i18n="f_iconfg">Corpo e antenas</span></label><input type="color" id="iconFg" value="#30dd81"></div>
-      <div class="field"><label for="iconScreen"><span data-i18n="f_iconscreen">Tela inferior</span></label><input type="color" id="iconScreen" value="#e4e4e4"></div>
-      <div class="field"><label for="iconEyes"><span data-i18n="f_iconeyes">Olhos / branco</span></label><input type="color" id="iconEyes" value="#ffffff"></div>
+      <div class="field"><label for="iconBg"><span data-i18n="f_iconbg">Tela</span></label><div class="icon-colorrow"><input type="color" id="iconBg" value="#077063"><input type="text" id="iconBgName" placeholder="nome ou #hex — ex.: verde petróleo" autocomplete="off" spellcheck="false"></div><small class="icon-name" id="iconBgHint"></small></div>
+      <div class="field"><label for="iconFg"><span data-i18n="f_iconfg">Corpo Android</span></label><div class="icon-colorrow"><input type="color" id="iconFg" value="#30dd81"><input type="text" id="iconFgName" placeholder="nome ou #hex — ex.: verde claro" autocomplete="off" spellcheck="false"></div><small class="icon-name" id="iconFgHint"></small></div>
+      <div class="field"><label for="iconEyes"><span data-i18n="f_iconeyes">Olhos Android</span></label><div class="icon-colorrow"><input type="color" id="iconEyes" value="#ffffff"><input type="text" id="iconEyesName" placeholder="nome ou #hex — ex.: quase branco" autocomplete="off" spellcheck="false"></div><small class="icon-name" id="iconEyesHint"></small></div>
+      <div class="field"><label for="iconScreen"><span data-i18n="f_iconscreen">Monitor</span></label><div class="icon-colorrow"><input type="color" id="iconScreen" value="#e4e4e4"><input type="text" id="iconScreenName" placeholder="nome ou #hex — ex.: cinza claro" autocomplete="off" spellcheck="false"></div><small class="icon-name" id="iconScreenHint"></small></div>
     </div>
+    <div class="moodrow">
+      <select id="iconMood" aria-label="mood"></select>
+      <input type="text" id="iconMoodName" data-i18n-ph="ph_mood" placeholder="ou digite um mood/tema — ex.: pôr do sol, oceano…" autocomplete="off" spellcheck="false">
+      <button id="moodBtn" type="button" data-i18n="b_mood">Aplicar paleta do mood</button>
+      <button id="moodShuffle" type="button" class="ghost" title="Aleatório">🎲</button>
+    </div>
+    <div id="ntcWarn"></div>
     <div class="preview">
       <svg id="iconPrev" viewBox="0 0 48 48" width="110" height="110" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="prévia do ícone">
         <path style="opacity:0.2" d="m 16.846877,12 c -1.116351,0 -2.227419,0.912229 -2.015075,2 l 3.122973,16 -5.596557,11.109375 C 11.959876,41.871734 11.885244,42.336988 12.177176,43 c 0.278672,0.632897 0.998812,1 1.747448,1 H 24 34.075375 c 0.748637,0 1.468777,-0.367103 1.747448,-1 0.291932,-0.663012 0.217302,-1.128266 -0.181041,-1.890625 L 30.045225,30 33.168198,14 c 0.212344,-1.087771 -0.898724,-2 -2.015075,-2 H 24 Z"/>
-        <path style="fill:#cccccc" d="m 16.846877,11 c -1.116351,0 -2.227419,0.912229 -2.015075,2 l 3.122973,16 -5.596557,11.109375 C 11.959876,40.871734 11.885244,41.336988 12.177176,42 c 0.278672,0.632897 0.998812,1 1.747448,1 H 24 34.075375 c 0.748637,0 1.468777,-0.367103 1.747448,-1 0.291932,-0.663012 0.217302,-1.128266 -0.181041,-1.890625 L 30.045225,29 33.168198,13 c 0.212344,-1.087771 -0.898724,-2 -2.015075,-2 H 24 Z"/>
+        <path id="pvBase" style="fill:#cccccc" d="m 16.846877,11 c -1.116351,0 -2.227419,0.912229 -2.015075,2 l 3.122973,16 -5.596557,11.109375 C 11.959876,40.871734 11.885244,41.336988 12.177176,42 c 0.278672,0.632897 0.998812,1 1.747448,1 H 24 34.075375 c 0.748637,0 1.468777,-0.367103 1.747448,-1 0.291932,-0.663012 0.217302,-1.128266 -0.181041,-1.890625 L 30.045225,29 33.168198,13 c 0.212344,-1.087771 -0.898724,-2 -2.015075,-2 H 24 Z"/>
         <rect style="opacity:0.2" width="40" height="32" x="4" y="6" rx="2" ry="2"/>
         <path fill="var(--icon-screen)" id="pvScreen" d="m 4,33 v 2 c 0,1.108 0.892,2 2,2 h 36 c 1.108,0 2,-0.892 2,-2 v -2 z"/>
         <path style="opacity:0.1" d="m 11.494141,15 a 1.5,1.5 0 0 0 -0.832032,0.255859 1.5,1.5 0 0 0 -0.40625,2.082032 l 3.13086,4.654297 C 10.404945,24.606192 8.4012371,28.299159 8.0019531,32.460938 7.9284599,34.000879 9.5546875,34 9.5546875,34 H 38.40625 c 0,0 1.672856,-3.38e-4 1.591797,-1.617188 -0.416529,-4.131451 -2.415618,-7.796833 -5.380859,-10.394531 l 3.126953,-4.65039 a 1.5,1.5 0 0 0 -0.40625,-2.082032 1.5,1.5 0 0 0 -1.125,-0.228515 1.5,1.5 0 0 0 -0.957032,0.634765 l -3.072265,4.566407 C 29.78649,18.814887 26.990024,18 24.001953,18 c -2.989385,0 -5.786177,0.815488 -8.183594,2.230469 l -3.074218,-4.56836 A 1.5,1.5 0 0 0 11.787109,15.027344 1.5,1.5 0 0 0 11.494141,15 Z"/>
@@ -148,7 +164,7 @@ footer a{color:var(--accent)}
 
   <section class="card" id="s-shortcut">
     <h2 data-i18n="s1">1. Sistema e atalho</h2>
-    <p class="hint" data-i18n="s1h">O nome vira o título e o arquivo de atalho (ex.: “Meu Celular” → meu-celular.desktop no Linux, Meu-Celular.lnk + .bat no Windows).</p>
+    <p class="hint" data-i18n="s1h">O nome vira o título e o arquivo de atalho (ex.: “Meu Celular” → meu-celular.desktop no Linux, Meu-Celular.lnk no Windows).</p>
     <div class="grid">
       <div class="field"><label for="os"><span data-i18n="f_os">Sistema operacional</span></label>
         <select id="os"><option value="linux">Linux (bash — install.sh)</option><option value="windows">Windows (PowerShell — install.ps1)</option></select><small data-i18n="f_osauto">Detectado automaticamente — troque se precisar.</small></div>
@@ -284,7 +300,7 @@ footer a{color:var(--accent)}
     <h2 data-i18n="s_api">Integração: query string, upload e arquivos</h2>
     <p data-i18n="p_api1">Qualquer parâmetro do scrcpy pode vir na query string com o nome da flag longa (sem --): booleanos como ?no-audio ou ?fullscreen, valores como ?max-size=1024&amp;video-codec=h265. Extras: shortcut-name, version (latest|v4.1|v3.3.4|outra tag), K|M|G (atalhos físicos) e icon-bg|icon-fg|icon-screen|icon-eyes (hex). Exemplo: ?shortcut-name=TV&amp;max-size=1024&amp;no-audio&amp;video-codec=h265. A query tem prioridade sobre o #hash salvo.</p>
     <p data-i18n="p_api2">Upload de .desktop: o formulário lê Name= e Exec= de um atalho existente (flags longas com = ou espaço e atalhos -d -e -m -b -f -n -K -M -G -w -S -t -x -s -p -r), preenche os campos e avisa o que foi ignorado. Cores do ícone não são recuperadas do SVG.</p>
-    <p data-i18n="p_api3">Arquivos: install.sh (Linux) e install.ps1 (Windows) aceitam os mesmos parâmetros — --shortcut-name/​-ShortcutName, --scrcpy-args/​-ScrcpyArgs, --icon-bg/​-IconBg (-fg/-screen/-eyes), --icon-url/​-IconUrl e --shortcut-only/​-ShortcutOnly. No Linux o ícone é o scrcpy.svg oficial recolorido via sed; no Windows o instalador salva o mesmo SVG recolorido e gera um .ico com as mesmas cores para o .lnk. Atalho: .desktop no Linux, par .bat + .lnk no Menu Iniciar no Windows. Documentação para IAs em llms.txt. O formulário nunca envia dados: tudo roda no navegador.</p>
+    <p data-i18n="p_api3">Arquivos: install.sh (Linux) e install.ps1 (Windows) aceitam os mesmos parâmetros — --shortcut-name/​-ShortcutName, --scrcpy-args/​-ScrcpyArgs, --icon-bg/​-IconBg (-fg/-screen/-eyes), --icon-url/​-IconUrl e --shortcut-only/​-ShortcutOnly. No Linux o ícone é o scrcpy.svg oficial recolorido via sed; no Windows o instalador salva o mesmo SVG recolorido e gera um .ico com as mesmas cores para o .lnk. Atalho: .desktop no Linux, .lnk no Menu Iniciar no Windows. Documentação para IAs em llms.txt. O formulário nunca envia dados: tudo roda no navegador.</p>
   </section>
 
   <section class="card" id="s-about">
@@ -326,6 +342,8 @@ footer a{color:var(--accent)}
   </section>
 </main>
 <footer><span data-i18n="f_footer">scrcpy-installer · scrcpy é Apache-2.0 © Genymobile · instalador MIT · sem afiliação oficial ·</span> <a href="https://github.com/zonaro/scrcpy-installer">repo</a> · <a href="https://github.com/Genymobile/scrcpy">Genymobile/scrcpy</a> · <a href="llms.txt">llms.txt</a></footer>
+<script src="https://cdn.jsdelivr.net/gh/zonaro/NameToColor@main/NameToColor.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/zonaro/NameToColor@main/NameToColor.ptBR.js"></script>
 <script>
 (function(){
 "use strict";
@@ -335,12 +353,12 @@ var BASE_PS1="https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/ins
 var DEF={bg:"#077063",fg:"#30dd81",screen:"#e4e4e4",eyes:"#ffffff"};
 var LANG="pt";
 var I18N={
-en:{gen:"— command generator",sub:"Configure scrcpy with the form. At the end, a copyable command installs scrcpy from the official repo, adds it to PATH and creates a shortcut with your settings and custom icon (.desktop on Linux, .bat + .lnk on Windows).",
-s1:"1. OS & shortcut",s1h:"The name becomes the shortcut title and file (e.g. “My Phone” → my-phone.desktop on Linux, My-Phone.lnk + .bat on Windows).",f_os:"Operating system",f_osauto:"Auto-detected — switch if needed.",
+en:{gen:"— command generator",sub:"Configure scrcpy with the form. At the end, a copyable command installs scrcpy from the official repo, adds it to PATH and creates a shortcut with your settings and custom icon (.desktop on Linux, .lnk on Windows).",
+s1:"1. OS & shortcut",s1h:"The name becomes the shortcut title and file (e.g. “My Phone” → my-phone.desktop on Linux, My-Phone.lnk on Windows).",f_os:"Operating system",f_osauto:"Auto-detected — switch if needed.",
 s2:"2. Connection",h2:"USB by default. Fill serial/TCP-IP only if needed.",
 s3:"3. Video & window",h3:"Tip:",h3b:"greatly improves performance.",
 s4:"4. Audio",h4:"Android 11+ for audio forwarding.",
-s5:"5. Control / input",s6:"6. Recording, camera & virtual display",s7:"Shortcut icon",h7:"Base:",h7b:"official. Colors are applied at download by the installer — and to this page's theme.",s8:"Ready command — copy & paste into a terminal",
+s5:"5. Control / input",s6:"6. Recording, camera & virtual display",s7:"Shortcut icon",h7:"Base:",h7b:"official. Colors are applied at download by the installer — and to this page's theme.",h7c:"Type any name (“dark blue”, “terracotta”, “#ff00aa”) or use the picker. The stand base follows the Monitor automatically.",s8:"Ready command — copy & paste into a terminal",
 f_name:"Config name",f_ver:"scrcpy version",o_latest:"latest (default)",o_custom:"custom…",f_tag:"Custom tag",
 f_serial:"Serial",f_usb:"USB",h_usb:"Force USB device",f_e:"TCP/IP",h_e:"Force TCP/IP device",f_tcpip:"TCP/IP",h_tcpip:"Empty + checked = auto-detect",f_tcpipf:"Enable",h_tcpipf:"No value: detects USB IP",f_port:"Port",h_port:"Default 27183:27199",
 f_maxsize:"Max size (px)",f_bitrate:"Bit-rate",f_maxfps:"Max FPS",f_codec:"Codec",o_defh264:"default (h264)",f_encoder:"Encoder",f_vsource:"Source",o_cam12:"camera (Android 12+)",f_dispid:"Display id",f_capor:"Capture",o_def0:"0 (default)",o_lock:"@90 (lock)",o_lockinit:"@ (lock initial)",f_crop:"Crop",f_novideo:"No video",f_fs:"Fullscreen",f_nowin:"No window",f_ontop:"Always on top",f_borderless:"Borderless",f_wintitle:"Title",f_winw:"Width",f_winh:"Height",f_ssaver:"Disable screensaver",f_fps:"Show FPS",
@@ -348,8 +366,8 @@ f_noaudio:"No audio",f_acodec:"Codec",o_defopus:"default (opus)",f_abitrate:"Bit
 f_nocontrol:"Read-only",f_keyboard:"Keyboard",f_flagk:"Physical keyboard",h_flagk:"uhid (or aoa with OTG)",f_mouse:"Mouse",f_flagm:"Physical mouse",f_gamepad:"Gamepad",f_flagg:"Gamepad",f_prefertext:"Prefer text",h_sdkonly:"Only with keyboard=sdk",f_rawkeys:"Raw keys",h_sdkonly2:"Only with keyboard=sdk",f_nokeyrepeat:"No repeat",f_legacypaste:"Legacy paste",f_noclipsync:"No clipboard sync",f_shortcutmod:"Shortcut mod",f_pushtarget:"Push target",
 f_record:"Record to",f_recordfmt:"Format",o_autoext:"auto (from extension)",f_camfacing:"Camera",o_any:"any",f_camsize:"Camera size",f_camfps:"Camera FPS",f_newdisplay:"New display",f_startapp:"Start app",sum_adv:"Advanced: OTG / power / v4",
 f_otg:"OTG mode",h_otg:"USB, no mirroring",f_stayawake:"Stay awake",f_screenoff:"Screen off",f_showtouches:"Show touches",f_poweroff:"Power off on close",f_timelimit:"Limit (s)",f_flex:"Flex display",tag_v4:"(v4+)",f_renderfit:"Fit",tag_v42:"(v4+)",f_keepactive:"Keep active",tag_v43:"(v4+)",f_bgcolor:"Window background",tag_v44:"(v4+)",f_camtorch:"Torch",tag_v45:"(v4+)",o_default:"default",
-f_iconbg:"Frame (background)",f_iconfg:"Body & antennas",f_iconscreen:"Lower screen",f_iconeyes:"Eyes / white",
-b_copy:"Copy command",b_desktop:"Download .desktop",b_bat:"Download .bat",b_sh:"Download .sh",b_ps1:"Download .ps1",h_dl_lin:"The oneliner installs scrcpy and creates the shortcut. The .desktop is just the shortcut (for those who already have scrcpy) — save it to ~/.local/share/applications/.",h_dl_win:"The one-liner installs scrcpy and creates the shortcut pair. The .bat is just the launcher (for those who already have scrcpy) — save it next to your .lnk, e.g. in the Start Menu folder.",sum_desktop:"Generated .desktop preview",sum_bat:"Generated .bat preview (+ .lnk target)",
+f_iconbg:"Screen",f_iconfg:"Android Body",f_iconscreen:"Monitor",f_iconeyes:"Android Eyes",b_mood:"Apply mood palette",ph_mood:"or type a mood/theme — e.g.: sunset, ocean…",
+b_copy:"Copy command",b_desktop:"Download .desktop",b_bat:"Download shortcut .ps1",b_sh:"Download .sh",b_ps1:"Download .ps1",h_dl_lin:"The oneliner installs scrcpy and creates the shortcut. The .desktop is just the shortcut (for those who already have scrcpy) — save it to ~/.local/share/applications/.",h_dl_win:"The command installs scrcpy and creates the .lnk straight at scrcpy.exe. The shortcut .ps1 creates the same .lnk (for those who already have scrcpy) — run it in PowerShell.",sum_desktop:"Generated .desktop preview",sum_bat:"Generated .lnk preview (Target + Arguments)",
 s_about:"About scrcpy",p_about1:"Scrcpy (pronounced “screen copy”) is a free, open-source app that mirrors and controls Android devices over USB or TCP/IP — no root, nothing permanently installed on the device. Lightweight (native), 30–120 fps, 35–70 ms latency, 1080p+ quality and ~1 s startup. No account, no ads, no internet: works offline.",
 h_fps:"Frame rate",h_lat:"Latency",h_qual:"Quality",h_lic:"License (Genymobile)",p_about2:"Features: screen mirroring, audio (Android 11+), recording, camera (Android 12+), virtual display, two-way clipboard, physical keyboard/mouse/gamepad (HID), OTG mode and V4L2 webcam on Linux.",
 s_req:"Requirements & first steps",req1:"Android 5.0 (API 21)+; audio needs Android 11+, camera needs Android 12+.",req2:"Enable USB debugging (Settings → Developer options; tap “Build number” 7× if hidden) and authorize the RSA prompt on the device.",req3:"Install with the command above (it bundles adb if you lack one) and run: scrcpy. For Wi-Fi: adb connect IP:5555, then scrcpy.",
@@ -364,15 +382,15 @@ f_upload:"Edit existing .desktop",h_upload:"Upload fills the form (Name + Exec).
 s_api:"Integration: query string, upload & files",
 p_api1:"Any scrcpy parameter can come from the query string using the long flag name (without --): booleans like ?no-audio or ?fullscreen, values like ?max-size=1024&video-codec=h265. Extras: shortcut-name, version (latest|v4.1|v3.3.4|other tag), K|M|G (physical shorthands) and icon-bg|icon-fg|icon-screen|icon-eyes (hex). Example: ?shortcut-name=TV&max-size=1024&no-audio&video-codec=h265. The query wins over the saved #hash.",
 p_api2:"Desktop upload: the form reads Name= and Exec= from an existing shortcut (long flags with = or space, plus shorthands -d -e -m -b -f -n -K -M -G -w -S -t -x -s -p -r), fills the fields and reports what was skipped. Icon colors cannot be recovered from the SVG.",
-p_api3:"Files: install.sh (Linux) and install.ps1 (Windows) accept the same parameters — --shortcut-name/-ShortcutName, --scrcpy-args/-ScrcpyArgs, --icon-bg/-IconBg (-fg/-screen/-eyes), --icon-url/-IconUrl and --shortcut-only/-ShortcutOnly. On Linux the icon is the official scrcpy.svg recolored via sed; on Windows the installer saves the same recolored SVG and generates an .ico with the same colors for the .lnk. Shortcut: .desktop on Linux, .bat + .lnk pair in the Start Menu on Windows. AI docs live in llms.txt. The form never sends data: everything runs in the browser.",
+p_api3:"Files: install.sh (Linux) and install.ps1 (Windows) accept the same parameters — --shortcut-name/-ShortcutName, --scrcpy-args/-ScrcpyArgs, --icon-bg/-IconBg (-fg/-screen/-eyes), --icon-url/-IconUrl and --shortcut-only/-ShortcutOnly. On Linux the icon is the official scrcpy.svg recolored via sed; on Windows the installer saves the same recolored SVG and generates an .ico with the same colors for the .lnk. Shortcut: .desktop on Linux, .lnk in the Start Menu on Windows. AI docs live in llms.txt. The form never sends data: everything runs in the browser.",
 b_link:"Copy link of this config",
 up_skip:"Skipped: ",up_noexec:"No Exec= line found",up_empty:"No Name=/Exec= found",up_icon:"icon colors are not imported"},
-es:{gen:"— generador de comandos",sub:"Configure scrcpy con el formulario. Al final, un comando copiable instala scrcpy desde el repo oficial, lo añade al PATH y crea un acceso con su configuración e icono personalizado (.desktop en Linux, .bat + .lnk en Windows).",
-s1:"1. Sistema y acceso",s1h:"El nombre será el título y el archivo de acceso (ej.: “Mi Teléfono” → mi-teléfono.desktop en Linux, Mi-Teléfono.lnk + .bat en Windows).",f_os:"Sistema operativo",f_osauto:"Detectado automáticamente — cambie si lo necesita.",
+es:{gen:"— generador de comandos",sub:"Configure scrcpy con el formulario. Al final, un comando copiable instala scrcpy desde el repo oficial, lo añade al PATH y crea un acceso con su configuración e icono personalizado (.desktop en Linux, .lnk en Windows).",
+s1:"1. Sistema y acceso",s1h:"El nombre será el título y el archivo de acceso (ej.: “Mi Teléfono” → mi-teléfono.desktop en Linux, Mi-Teléfono.lnk en Windows).",f_os:"Sistema operativo",f_osauto:"Detectado automáticamente — cambie si lo necesita.",
 s2:"2. Conexión",h2:"USB por defecto. Complete serial/TCP-IP solo si lo necesita.",
 s3:"3. Video y ventana",h3:"Consejo:",h3b:"mejora mucho el rendimiento.",
 s4:"4. Audio",h4:"Android 11+ para reenvío de audio.",
-s5:"5. Control / entrada",s6:"6. Grabación, cámara y pantalla virtual",s7:"Icono del acceso",h7:"Base:",h7b:"oficial. Los colores se aplican al descargar con el instalador — y al tema de esta página.",s8:"Comando listo — copie y pegue en la terminal",
+s5:"5. Control / entrada",s6:"6. Grabación, cámara y pantalla virtual",s7:"Icono del acceso",h7:"Base:",h7b:"oficial. Los colores se aplican al descargar con el instalador — y al tema de esta página.",h7c:"Escriba cualquier nombre (“azul oscuro”, “terracota”, “#ff00aa”) o use el selector. La base del soporte sigue al Monitor automáticamente.",s8:"Comando listo — copie y pegue en la terminal",
 f_name:"Nombre de la config",f_ver:"Versión de scrcpy",o_latest:"latest (defecto)",o_custom:"custom…",f_tag:"Etiqueta custom",
 f_serial:"Serial",f_usb:"USB",h_usb:"Forzar dispositivo USB",f_e:"TCP/IP",h_e:"Forzar dispositivo TCP/IP",f_tcpip:"TCP/IP",h_tcpip:"Vacío + marcado = autodetección",f_tcpipf:"Activar",h_tcpipf:"Sin valor: detecta IP del USB",f_port:"Puerto",h_port:"Defecto 27183:27199",
 f_maxsize:"Tamaño máx (px)",f_bitrate:"Bit-rate",f_maxfps:"FPS máx",f_codec:"Códec",o_defh264:"defecto (h264)",f_encoder:"Encoder",f_vsource:"Fuente",o_cam12:"cámara (Android 12+)",f_dispid:"Display id",f_capor:"Captura",o_def0:"0 (defecto)",o_lock:"@90 (fijar)",o_lockinit:"@ (fijar inicial)",f_crop:"Recorte",f_novideo:"Sin video",f_fs:"Pantalla completa",f_nowin:"Sin ventana",f_ontop:"Siempre encima",f_borderless:"Sin bordes",f_wintitle:"Título",f_winw:"Ancho",f_winh:"Alto",f_ssaver:"Desactivar salvapantallas",f_fps:"Mostrar FPS",
@@ -380,8 +398,8 @@ f_noaudio:"Sin audio",f_acodec:"Códec",o_defopus:"defecto (opus)",f_abitrate:"B
 f_nocontrol:"Solo lectura",f_keyboard:"Teclado",f_flagk:"Teclado físico",h_flagk:"uhid (o aoa con OTG)",f_mouse:"Ratón",f_flagm:"Ratón físico",f_gamepad:"Gamepad",f_flagg:"Gamepad",f_prefertext:"Preferir texto",h_sdkonly:"Solo con keyboard=sdk",f_rawkeys:"Raw keys",h_sdkonly2:"Solo con keyboard=sdk",f_nokeyrepeat:"Sin repetición",f_legacypaste:"Pegado legado",f_noclipsync:"Sin sync portapapeles",f_shortcutmod:"Mod atajos",f_pushtarget:"Destino push",
 f_record:"Grabar en",f_recordfmt:"Formato",o_autoext:"auto (por extensión)",f_camfacing:"Cámara",o_any:"cualquiera",f_camsize:"Tam. cámara",f_camfps:"FPS cámara",f_newdisplay:"Nueva pantalla",f_startapp:"Iniciar app",sum_adv:"Avanzado: OTG / energía / v4",
 f_otg:"Modo OTG",h_otg:"USB, sin espejado",f_stayawake:"Mantener encendido",f_screenoff:"Pantalla off",f_showtouches:"Mostrar toques",f_poweroff:"Apagar al cerrar",f_timelimit:"Límite (s)",f_flex:"Flex display",tag_v4:"(v4+)",f_renderfit:"Ajuste",tag_v42:"(v4+)",f_keepactive:"Mantener activo",tag_v43:"(v4+)",f_bgcolor:"Fondo ventana",tag_v44:"(v4+)",f_camtorch:"Flash",tag_v45:"(v4+)",o_default:"defecto",
-f_iconbg:"Marco (fondo)",f_iconfg:"Cuerpo y antenas",f_iconscreen:"Pantalla inferior",f_iconeyes:"Ojos / blanco",
-b_copy:"Copiar comando",b_desktop:"Descargar .desktop",b_bat:"Descargar .bat",b_sh:"Descargar .sh",b_ps1:"Descargar .ps1",h_dl_lin:"El oneliner instala scrcpy y crea el acceso. El .desktop es solo el acceso (para quien ya tiene scrcpy) — guárdelo en ~/.local/share/applications/.",h_dl_win:"El comando instala scrcpy y crea el par de acceso. El .bat es solo el lanzador (para quien ya tiene scrcpy) — guárdelo junto a su .lnk, ej. en la carpeta del Menú Inicio.",sum_desktop:"Vista previa del .desktop generado",sum_bat:"Vista previa del .bat generado (+ destino del .lnk)",
+f_iconbg:"Pantalla",f_iconfg:"Cuerpo Android",f_iconscreen:"Monitor",f_iconeyes:"Ojos Android",b_mood:"Aplicar paleta del mood",ph_mood:"o escriba un mood/tema — ej.: atardecer, océano…",
+b_copy:"Copiar comando",b_desktop:"Descargar .desktop",b_bat:"Descargar .ps1 del acceso",b_sh:"Descargar .sh",b_ps1:"Descargar .ps1",h_dl_lin:"El oneliner instala scrcpy y crea el acceso. El .desktop es solo el acceso (para quien ya tiene scrcpy) — guárdelo en ~/.local/share/applications/.",h_dl_win:"El comando instala scrcpy y crea el .lnk directo a scrcpy.exe. El .ps1 del acceso crea el mismo .lnk (para quien ya tiene scrcpy) — ejecútelo en PowerShell.",sum_desktop:"Vista previa del .desktop generado",sum_bat:"Vista previa del .lnk generado (Target + Arguments)",
 s_about:"Acerca de scrcpy",p_about1:"Scrcpy (se pronuncia “screen copy”) es una app gratuita y open source que espeja y controla Android por USB o TCP/IP — sin root y sin instalar nada permanente en el aparato. Ligera (nativa), 30–120 fps, latencia 35–70 ms, calidad 1080p+ e inicio en ~1 s. Sin cuenta, sin anuncios y sin internet: funciona offline.",
 h_fps:"Cuadros por segundo",h_lat:"Latencia",h_qual:"Calidad",h_lic:"Licencia (Genymobile)",p_about2:"Funciones: espejado de pantalla, audio (Android 11+), grabación, cámara (Android 12+), pantalla virtual, portapapeles bidireccional, teclado/ratón/gamepad físicos (HID), modo OTG y webcam V4L2 en Linux.",
 s_req:"Requisitos y primeros pasos",req1:"Android 5.0 (API 21)+; audio exige Android 11+, cámara exige Android 12+.",req2:"Active la depuración USB (Ajustes → Opciones de desarrollador; toque 7× “Número de compilación” si está oculto) y autorice el RSA en el aparato.",req3:"Instale con el comando de arriba (incluye adb si no tiene uno) y ejecute: scrcpy. Para Wi-Fi: adb connect IP:5555 y luego scrcpy.",
@@ -396,12 +414,12 @@ f_upload:"Editar .desktop existente",h_upload:"La subida completa el formulario 
 s_api:"Integración: query string, subida y archivos",
 p_api1:"Cualquier parámetro de scrcpy puede venir en la query string con el nombre de la flag larga (sin --): booleanos como ?no-audio o ?fullscreen, valores como ?max-size=1024&video-codec=h265. Extras: shortcut-name, version (latest|v4.1|v3.3.4|otra etiqueta), K|M|G (atajos físicos) e icon-bg|icon-fg|icon-screen|icon-eyes (hex). Ejemplo: ?shortcut-name=TV&max-size=1024&no-audio&video-codec=h265. La query prevalece sobre el #hash guardado.",
 p_api2:"Subida de .desktop: el formulario lee Name= y Exec= de un acceso existente (flags largas con = o espacio, más atajos -d -e -m -b -f -n -K -M -G -w -S -t -x -s -p -r), completa los campos e informa lo omitido. Los colores del icono no se recuperan del SVG.",
-p_api3:"Archivos: install.sh (Linux) e install.ps1 (Windows) aceptan los mismos parámetros — --shortcut-name/-ShortcutName, --scrcpy-args/-ScrcpyArgs, --icon-bg/-IconBg (-fg/-screen/-eyes), --icon-url/-IconUrl y --shortcut-only/-ShortcutOnly. En Linux el icono es el scrcpy.svg oficial recolorido vía sed; en Windows el instalador guarda el mismo SVG recolorido y genera un .ico con los mismos colores para el .lnk. Acceso: .desktop en Linux, par .bat + .lnk en el Menú Inicio en Windows. Docs para IA en llms.txt. El formulario nunca envía datos: todo corre en el navegador.",
+p_api3:"Archivos: install.sh (Linux) e install.ps1 (Windows) aceptan los mismos parámetros — --shortcut-name/-ShortcutName, --scrcpy-args/-ScrcpyArgs, --icon-bg/-IconBg (-fg/-screen/-eyes), --icon-url/-IconUrl y --shortcut-only/-ShortcutOnly. En Linux el icono es el scrcpy.svg oficial recolorido vía sed; en Windows el instalador guarda el mismo SVG recolorido y genera un .ico con los mismos colores para el .lnk. Acceso: .desktop en Linux, .lnk en el Menú Inicio en Windows. Docs para IA en llms.txt. El formulario nunca envía datos: todo corre en el navegador.",
 b_link:"Copiar enlace de esta config",
 up_skip:"Omitidas: ",up_noexec:"Sin línea Exec=",up_empty:"Sin Name=/Exec=",up_icon:"colores del icono no se importan"}
 };
 function autoLang(){var l=(navigator.language||"pt").slice(0,2);if(!I18N[l])l="pt";try{var s=localStorage.getItem("scrcpy-gen-lang");if(s&&(I18N[s]||s==="pt"))l=s;}catch(e){}return l;}
-function applyLang(l){LANG=l;var d=I18N[l]||{};document.querySelectorAll("[data-i18n]").forEach(function(el){if(el.dataset.orig===undefined)el.dataset.orig=el.innerHTML;var k=el.getAttribute("data-i18n");el.innerHTML=(l==="pt"||!d[k])?el.dataset.orig:d[k];});document.documentElement.lang=l==="pt"?"pt-BR":l;try{localStorage.setItem("scrcpy-gen-lang",l);}catch(e){}update();}
+function applyLang(l){LANG=l;var d=I18N[l]||{};document.querySelectorAll("[data-i18n]").forEach(function(el){if(el.dataset.orig===undefined)el.dataset.orig=el.innerHTML;var k=el.getAttribute("data-i18n");el.innerHTML=(l==="pt"||!d[k])?el.dataset.orig:d[k];});document.querySelectorAll("[data-i18n-ph]").forEach(function(el){if(el.dataset.origPh===undefined)el.dataset.origPh=el.getAttribute("placeholder")||"";var k=el.getAttribute("data-i18n-ph");el.setAttribute("placeholder",(l==="pt"||!d[k])?el.dataset.origPh:d[k]);});document.documentElement.lang=l==="pt"?"pt-BR":l;try{localStorage.setItem("scrcpy-gen-lang",l);}catch(e){}if(typeof buildMoodSelect==="function")buildMoodSelect();update();}
 function slugify(s){return (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[ _]+/g,"-").replace(/[^a-z0-9-]/g,"").replace(/-{2,}/g,"-").replace(/^-|-$/g,"")||"scrcpy";}
 function shSingle(s){return "'"+String(s).replace(/'/g,"'\\''")+"'";}
 function psSingle(s){return "'"+String(s).replace(/'/g,"''")+"'";}
@@ -480,7 +498,87 @@ function buildArgs(){
   return a.join(" ");
 }
 function T(k){var d=I18N[LANG]||{};return d[k]||PT[k]||k;}
-var PT={v_excl:"--prefer-text e --raw-key-events são mutuamente exclusivos.",v_sdk:"--prefer-text/--raw-key-events exigem --keyboard=sdk.",v_mouse:"--mouse=sdk requer playback de vídeo (desmarque --no-video ou use uhid).",v_dup:"--audio-dup exige --audio-source=playback.",v_cam:"Opções de câmera exigem fonte = camera (aplicado automaticamente).",v_v4:"Flags marcadas (v4+) exigem scrcpy v4 ou superior.",v_otg:"--otg desabilita espelhamento; conflita com fonte camera.",copied:"Copiado!",b_copy:"Copiar comando",b_desktop:"Baixar .desktop",b_bat:"Baixar .bat",b_sh:"Baixar .sh",b_ps1:"Baixar .ps1",sum_desktop:"Prévia do .desktop gerado",sum_bat:"Prévia do .bat gerado (+ destino do .lnk)",h_dl_lin:"O oneliner instala o scrcpy e cria o atalho. O .desktop é só o atalho (para quem já tem o scrcpy instalado) — salve em ~/.local/share/applications/.",h_dl_win:"O comando instala o scrcpy e cria o par de atalho. O .bat é só o lançador (para quem já tem o scrcpy) — salve junto do seu .lnk, ex. na pasta do Menu Iniciar."};
+var PT={v_excl:"--prefer-text e --raw-key-events são mutuamente exclusivos.",v_sdk:"--prefer-text/--raw-key-events exigem --keyboard=sdk.",v_mouse:"--mouse=sdk requer playback de vídeo (desmarque --no-video ou use uhid).",v_dup:"--audio-dup exige --audio-source=playback.",v_cam:"Opções de câmera exigem fonte = camera (aplicado automaticamente).",v_v4:"Flags marcadas (v4+) exigem scrcpy v4 ou superior.",v_otg:"--otg desabilita espelhamento; conflita com fonte camera.",copied:"Copiado!",b_copy:"Copiar comando",b_desktop:"Baixar .desktop",b_bat:"Baixar .ps1 do atalho",b_sh:"Baixar .sh",b_ps1:"Baixar .ps1",sum_desktop:"Prévia do .desktop gerado",sum_bat:"Prévia do .lnk gerado (Target + Arguments)",h_dl_lin:"O oneliner instala o scrcpy e cria o atalho. O .desktop é só o atalho (para quem já tem o scrcpy instalado) — salve em ~/.local/share/applications/.",h_dl_win:"O comando instala o scrcpy e cria o atalho .lnk direto no scrcpy.exe. O .ps1 do atalho cria o mesmo .lnk (para quem já tem o scrcpy) — rode no PowerShell."};
+/* ---- NameToColor.js: cores arbitrárias + paleta por mood (zonaro/NameToColor) ---- */
+var ICON_SLOTS=[{color:"iconBg",name:"iconBgName",hint:"iconBgHint"},{color:"iconFg",name:"iconFgName",hint:"iconFgHint"},{color:"iconEyes",name:"iconEyesName",hint:"iconEyesHint"},{color:"iconScreen",name:"iconScreenName",hint:"iconScreenHint"}];
+var MOOD_GROUPS=[["Moods",["Vibrant","Futuristic","Fun","Soft Pastel","Calm","Vintage","Organic","Sophisticated","Dark","Corporate"]],["Natureza",["Nature","Forest","Water","Ocean","Beach","Mountain","Desert","Tropical","Floral","Earth","Sky","Sunset","Night","Space","Spring","Summer","Autumn","Winter"]],["Materiais",["Metal","Gold","Silver","Copper","Wood","Stone","Concrete","Glass"]],["Público",["Children","Baby","Youth","Wellness","Luxury"]],["Ocasiões",["Wedding","Romance","Celebration"]],["Estilos",["Minimal"]],["Indústrias",["Coffee","Food","Restaurant","Agriculture","Industry","Construction","Automotive","Technology","Gaming","Healthcare","Finance","Education","Science","Energy","Sustainability","Real Estate","Travel","Sports","Music","Fashion","Retail","Security","Beauty","Pets"]]];
+function ntcReady(){return (typeof generateColor==="function")&&(typeof generateThemePalette==="function");}
+function ntcNormalize(hex){try{if(typeof normalizeHex==="function")return normalizeHex(hex);}catch(e){}return hex;}
+function isHexLike(s){return /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(String(s||"").trim());}
+function ntcHex(text){
+  var t=String(text==null?"":text).trim();
+  if(!t)return "";
+  if(isHexLike(t)){try{return ntcNormalize(t).toLowerCase();}catch(e){return t.toLowerCase();}}
+  if(!ntcReady())return "";
+  try{
+    var out=generateColor(t);
+    if(Array.isArray(out))out=out[0];
+    if(!out)return "";
+    return ntcNormalize(out).toLowerCase();
+  }catch(e){return "";}
+}
+function shadeHex(hex,f){
+  var h=String(hex||"").trim().replace("#","");
+  if(h.length===3)h=h.split("").map(function(c){return c+c;}).join("");
+  if(h.length>6)h=h.slice(0,6);
+  if(!/^[0-9a-f]{6}$/i.test(h))return "#cccccc";
+  var r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+  function ch(v){v=Math.round(v*f);if(v<0)v=0;if(v>255)v=255;var s=v.toString(16);return s.length===1?"0"+s:s;}
+  return ("#"+ch(r)+ch(g)+ch(b)).toLowerCase();
+}
+function baseFromScreen(hex){return shadeHex(hex||"#e4e4e4",0.895);}
+function ntcLocale(){return LANG==="pt"?"pt-BR":LANG;}
+function ntcName(hex){
+  if(!hex||!ntcReady())return "";
+  try{if(typeof colorName==="function"){var n=colorName(hex,ntcLocale());if(n)return n;}}catch(e){}
+  return "";
+}
+function refreshIconHints(){
+  ICON_SLOTS.forEach(function(s){
+    var c=$(s.color),h=$(s.hint);
+    if(!c||!h)return;
+    var hex=(c.value||"").toLowerCase();
+    var nm=ntcName(hex);
+    h.innerHTML=nm?("<b>"+hex+"</b> · "+nm):("<b>"+hex+"</b>");
+  });
+}
+function setIconColor(colorId,raw){
+  var el=$(colorId);
+  if(!el)return false;
+  var t=String(raw==null?"":raw).trim();
+  if(!t)return false;
+  var hex=isHexLike(t)?(function(){try{return ntcNormalize(t).toLowerCase();}catch(e){return t.toLowerCase();}})():ntcHex(t);
+  if(!hex||!/^#[0-9a-f]{6}([0-9a-f]{2})?$/.test(hex))return false;
+  el.value=hex.slice(0,7);
+  return true;
+}
+function applyThemeToIcon(theme){
+  if(!ntcReady()||!theme)return [];
+  var pal=null;
+  try{pal=generateThemePalette(theme,4);}catch(e){pal=[];}
+  if(!pal||!pal.length)return [];
+  var order=["iconBg","iconFg","iconScreen","iconEyes"];
+  var applied=[];
+  pal.slice(0,4).forEach(function(c,i){
+    var hex="";try{hex=ntcNormalize(c).toLowerCase();}catch(e){hex=String(c||"").toLowerCase();}
+    if(/^#[0-9a-f]{6}/.test(hex)){$(order[i]).value=hex.slice(0,7);applied.push(hex.slice(0,7));}
+  });
+  update();
+  return applied;
+}
+function buildMoodSelect(){
+  var sel=$("iconMood");
+  if(!sel)return;
+  var cur=sel.value;
+  sel.innerHTML="";
+  MOOD_GROUPS.forEach(function(g){
+    var og=document.createElement("optgroup");og.label=g[0];
+    g[1].forEach(function(m){var o=document.createElement("option");o.value=m;o.textContent=m;og.appendChild(o);});
+    sel.appendChild(og);
+  });
+  if(cur){try{sel.value=cur;}catch(e){}}
+  if(!sel.value)sel.value="Vibrant";
+}
 function validate(){
   var w=[];
   if(checked("preferText")&&checked("rawKeys"))w.push(["err",T("v_excl")]);
@@ -496,6 +594,11 @@ var QMAP=[["shortcut-name","shortcutName","t"],["serial","serial","t"],["select-
 var REV={};QMAP.forEach(function(m){REV[m[0]]=m;});
 function setField(id,type,v){
   var el=$(id);if(!el)return false;
+  if(id==="iconBg"||id==="iconFg"||id==="iconScreen"||id==="iconEyes"){
+    if(setIconColor(id,v))return true;
+    if(isHexLike(String(v||""))){el.value=String(v).trim().toLowerCase().slice(0,7);return true;}
+    return false;
+  }
   if(type==="b"){el.checked=(v===""||v==="1"||v==="true");return true;}
   if(el.tagName==="SELECT"){var ok=false;for(var i=0;i<el.options.length;i++)if(el.options[i].value===v||el.options[i].text===v){ok=true;break;}if(!ok)return false;el.value=v;return true;}
   el.value=v;return true;
@@ -555,7 +658,7 @@ function update(){
   var win=isWin();
   $("slugPrev").textContent=slug;$("slugPrev2").textContent=slug;$("deskName").textContent=name;
   $("deskDir").textContent=win?"Menu Iniciar\\scrcpy-installer\\":"~/.local/share/applications/";
-  $("deskExt").textContent=win?".lnk + .bat":".desktop";
+  $("deskExt").textContent=win?".lnk":".desktop";
   var scrcpyArgs=buildArgs();
   var ver=selVersion();
   var bg=$("iconBg").value,fg=$("iconFg").value,sc=$("iconScreen").value,ey=$("iconEyes").value;
@@ -582,10 +685,44 @@ function update(){
     cmd=parts.join(" ");
   }
   $("oneliner").textContent=cmd;
-  var batExe=ver?"\"%LOCALAPPDATA%\\scrcpy\\lib\\scrcpy\\"+ver+"\\scrcpy.exe\"":"scrcpy.exe";
-  var batPrev="@echo off\r\nREM generated by scrcpy-installer - do not edit manually\r\n"+batExe+(scrcpyArgs?" "+scrcpyArgs:"")+" %*\r\nREM Start Menu shortcut: "+slug+".lnk -> this file (icon: "+slug+".ico)";
+  var lnkExe=ver?"%LOCALAPPDATA%\\scrcpy\\lib\\scrcpy\\"+ver+"\\scrcpy.exe":"scrcpy.exe";
+  var lnkWork=ver?"%LOCALAPPDATA%\\scrcpy\\lib\\scrcpy\\"+ver:"(pasta do scrcpy.exe)";
+  var winPrev="Start Menu shortcut: "+slug+".lnk\r\nTarget: "+lnkExe+"\r\nArguments: "+(scrcpyArgs||"(nenhum)")+"\r\nWorkingDirectory: "+lnkWork+"\r\nIcon: "+slug+".ico\r\nDescription: scrcpy "+scrcpyArgs;
   var bin="~/.local/bin/scrcpy";
-  $("desktopPrev").textContent=win?batPrev:("[Desktop Entry]\nName="+name+"\nComment=scrcpy "+scrcpyArgs+"\nExec="+bin+(scrcpyArgs?" "+scrcpyArgs:"")+"\nIcon=~/.local/share/icons/"+slug+".svg\nTerminal=false\nType=Application\nCategories=Utility;Video;\nStartupWMClass=scrcpy");
+  $("desktopPrev").textContent=win?winPrev:("[Desktop Entry]\nName="+name+"\nComment=scrcpy "+scrcpyArgs+"\nExec="+bin+(scrcpyArgs?" "+scrcpyArgs:"")+"\nIcon=~/.local/share/icons/"+slug+".svg\nTerminal=false\nType=Application\nCategories=Utility;Video;\nStartupWMClass=scrcpy");
+  try{
+    var psName=psSingle(name),psSlug=psSingle(slug),psArgs2=psSingle(scrcpyArgs),psVer=psSingle(ver||"");
+    var lines=[];
+    lines.push("# "+slug+".lnk creator - generated by https://zonaro.github.io/scrcpy-installer/");
+    lines.push("# Run in PowerShell: creates the Start Menu shortcut directly (no .bat).");
+    lines.push("# Custom .ico colors need the full installer oneliner above.");
+    lines.push("$ErrorActionPreference = \"Stop\"");
+    lines.push("$shortcutName = "+psName);
+    lines.push("$slug = "+psSlug);
+    lines.push("$scrcpyArgs = "+psArgs2);
+    lines.push("$wantedVersion = "+psVer);
+    lines.push("$exe = \"\"");
+    lines.push("if ($wantedVersion) { $cand = Join-Path $env:LOCALAPPDATA (\"scrcpy\\lib\\scrcpy\\\" + $wantedVersion + \"\\scrcpy.exe\"); if (Test-Path $cand) { $exe = $cand } }");
+    lines.push("if (-not $exe) { $c = Get-Command \"scrcpy.exe\" -ErrorAction SilentlyContinue; if ($c) { $exe = $c.Source } }");
+    lines.push("if (-not $exe) { $exe = \"scrcpy.exe\" }");
+    lines.push("$shortcutDir = Join-Path $env:APPDATA \"Microsoft\\Windows\\Start Menu\\Programs\\scrcpy-installer\"");
+    lines.push("if (-not (Test-Path $shortcutDir)) { New-Item -ItemType Directory -Path $shortcutDir -Force | Out-Null }");
+    lines.push("$lnkFile = Join-Path $shortcutDir ($slug + \".lnk\")");
+    lines.push("$legacyBat = Join-Path $shortcutDir ($slug + \".bat\")");
+    lines.push("if (Test-Path $legacyBat) { Remove-Item $legacyBat -Force }");
+    lines.push("$shell = New-Object -ComObject WScript.Shell");
+    lines.push("$sc = $shell.CreateShortcut($lnkFile)");
+    lines.push("$sc.TargetPath = $exe");
+    lines.push("$sc.Arguments = $scrcpyArgs");
+    lines.push("$exeDir = Split-Path $exe -Parent");
+    lines.push("if ($exeDir) { $sc.WorkingDirectory = $exeDir }");
+    lines.push("$sc.Description = (\"scrcpy \" + $scrcpyArgs).Trim()");
+    lines.push("$sc.WindowStyle = 1");
+    lines.push("if (Test-Path $exe) { $sc.IconLocation = \"$exe,0\" }");
+    lines.push("$sc.Save()");
+    lines.push("Write-Host \"shortcut ready ($lnkFile)\"");
+    window._winLnkPs1=lines.join("\r\n")+"\r\n";
+  }catch(e){window._winLnkPs1=winPrev;}
   $("dlHint").textContent=T(win?"h_dl_win":"h_dl_lin");
   $("deskSum").textContent=T(win?"sum_bat":"sum_desktop");
   $("dlShortcutBtn").textContent=T(win?"b_bat":"b_desktop");
@@ -596,6 +733,21 @@ function update(){
   rs.setProperty("--icon-bg",bg);rs.setProperty("--icon-fg",fg);
   rs.setProperty("--icon-screen",sc);rs.setProperty("--icon-eyes",ey);
   rs.setProperty("--accent",fg);rs.setProperty("--accent2",bg);
+  try{
+    var base=baseFromScreen(sc);
+    var pv=$("pvBase");
+    if(pv)pv.setAttribute("fill",base);
+  }catch(e){}
+  try{refreshIconHints();}catch(e){}
+  try{
+    var nw=$("ntcWarn");
+    if(nw){
+      if(!ntcReady()){
+        nw.style.display="block";
+        nw.textContent=(LANG==="pt")?"NameToColor.js offline: nomes arbitrários e paleta por mood indisponíveis — use o seletor de cor.":(LANG==="es"?"NameToColor.js sin conexión: nombres y paleta por mood no disponibles — use el selector.":"NameToColor.js offline: arbitrary names & mood palette unavailable — use the picker.");
+      }else{nw.style.display="none";nw.textContent="";}
+    }
+  }catch(e){}
   try{var q={};document.querySelectorAll("input,select").forEach(function(el){if(el.id)q[el.id]=el.type==="checkbox"?el.checked:el.value;});history.replaceState(null,"","#"+btoa(unescape(encodeURIComponent(JSON.stringify(q)))).slice(0,2000));}catch(e){}
 }
 function restore(){
@@ -620,7 +772,7 @@ $("copyBtn").addEventListener("click",function(){
 function downloadFile(name,content,type){var blob=new Blob([content],{type:type});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},2000);}
 $("dlShortcutBtn").addEventListener("click",function(){
   var slug=(function(){var s=(val("shortcutName")||"scrcpy");return slugify(s);})();
-  if(isWin())downloadFile(slug+".bat",$("desktopPrev").textContent.replace(/\r\n/g,"\n").replace(/\n/g,"\r\n"),"text/plain");
+  if(isWin())downloadFile(slug+"-atalho.ps1",(window._winLnkPs1||$("desktopPrev").textContent).replace(/\r\n/g,"\n").replace(/\n/g,"\r\n"),"text/plain");
   else downloadFile(slug+".desktop",$("desktopPrev").textContent+"\n","text/plain");
 });
 $("dlBtn").addEventListener("click",function(){
@@ -660,6 +812,45 @@ $("desktopFile").addEventListener("change",function(){
 });
 $("lang").addEventListener("change",function(){applyLang($("lang").value);});
 $("os").addEventListener("change",function(){persistOS();});
+(function setupIconEditor(){
+  if(typeof buildMoodSelect==="function")buildMoodSelect();
+  ICON_SLOTS.forEach(function(s){
+    var nameEl=$(s.name),colorEl=$(s.color);
+    if(nameEl){
+      nameEl.addEventListener("change",function(){
+        var raw=nameEl.value;
+        if(!raw.trim()){update();return;}
+        if(!setIconColor(s.color,raw)){
+          nameEl.style.borderColor="var(--err)";
+          setTimeout(function(){nameEl.style.borderColor="";},1200);
+          return;
+        }
+        nameEl.style.borderColor="";
+        update();
+      });
+    }
+    if(colorEl){
+      colorEl.addEventListener("input",function(){
+        var nm=$(s.name);
+        if(nm&&nm.value&&isHexLike(nm.value))nm.value="";
+        update();
+      });
+    }
+  });
+  var moodSel=$("iconMood"),moodTxt=$("iconMoodName"),moodBtn=$("moodBtn"),shuf=$("moodShuffle");
+  function currentMood(){var t=moodTxt&&moodTxt.value.trim()?moodTxt.value.trim():(moodSel?moodSel.value:"");return t;}
+  function doMood(){var m=currentMood();if(!m)return;var pal=applyThemeToIcon(m);if(moodTxt)moodTxt.value="";if(!pal.length&&moodTxt){moodTxt.style.borderColor="var(--err)";setTimeout(function(){moodTxt.style.borderColor="";},1200);}};
+  if(moodBtn)moodBtn.addEventListener("click",doMood);
+  if(moodSel)moodSel.addEventListener("change",function(){if(moodTxt)moodTxt.value="";doMood();});
+  if(moodTxt)moodTxt.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();doMood();}});
+  if(shuf)shuf.addEventListener("click",function(){
+    var all=[];MOOD_GROUPS.forEach(function(g){g[1].forEach(function(m){all.push(m);});});
+    var pick=all[Math.floor(Math.random()*all.length)];
+    if(moodSel)moodSel.value=pick;
+    if(moodTxt)moodTxt.value="";
+    applyThemeToIcon(pick);
+  });
+})();
 (function setupResultToggle(){
   var sec=$("result"),btn=$("resultToggle");
   if(!sec||!btn)return;

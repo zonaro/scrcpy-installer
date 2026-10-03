@@ -8,7 +8,7 @@ Install or update [scrcpy](https://github.com/Genymobile/scrcpy) on any Linux di
 - Verifies the download with the official **SHA256** checksums
 - **Idempotent**: re-running the command updates scrcpy to the newest release (asks for confirmation first when an older version is installed; `--force` / `-Force` skips the prompt)
 - The `scrcpy` command shortcut is **always recreated**, even when the version is already up to date
-- Optional **shortcuts** per device, with baked-in `scrcpy` arguments and a recolored icon: `.desktop` + custom SVG icon on Linux, `.bat` + `.lnk` (Start Menu) + custom `.ico` on Windows
+- Optional **shortcuts** per device, with baked-in `scrcpy` arguments and a recolored icon: `.desktop` + custom SVG icon on Linux, `.lnk` (Start Menu) + custom `.ico` on Windows
 - Can be run as a **normal user** (Linux: `~/.local`; Windows: `%LOCALAPPDATA%\scrcpy`) or **system-wide** (Linux: `/usr/local`; Windows: `%ProgramFiles%\scrcpy`)
 
 > Prefer the visual way? The [web generator](https://zonaro.github.io/scrcpy-installer/) builds the command for you (Linux + Windows, PT-BR/EN/ES).
@@ -61,7 +61,7 @@ curl -fsSL https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/instal
 
 ## Windows (PowerShell)
 
-Same behavior as Linux, via `install.ps1` — downloads the official `scrcpy-win64` (or `win32`) zip, verifies SHA256, extracts to `%LOCALAPPDATA%\scrcpy`, registers it on your user PATH, and optionally creates a Start Menu shortcut pair (`.bat` launcher + `.lnk` with a custom `.ico` in your colors).
+Same behavior as Linux, via `install.ps1` — downloads the official `scrcpy-win64` (or `win32`) zip, verifies SHA256, extracts to `%LOCALAPPDATA%\scrcpy`, registers it on your user PATH, and optionally creates a Start Menu shortcut (`.lnk` pointing directly at `scrcpy.exe` with baked-in args and a custom `.ico` in your colors).
 
 ```powershell
 Invoke-WebRequest -Uri https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/install.ps1 -OutFile install.ps1
@@ -80,7 +80,7 @@ One-liner without touching disk:
 & ([scriptblock]::Create((Invoke-RestMethod https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/install.ps1))) -ShortcutName "Meu Celular"
 ```
 
-> System-wide instead (`%ProgramFiles%\scrcpy`): run PowerShell **as Administrator** and add `-System`. Uninstall: `.\install.ps1 -Uninstall` (add `-ShortcutName "Meu Celular"` to also remove that shortcut pair and its icons).
+> System-wide instead (`%ProgramFiles%\scrcpy`): run PowerShell **as Administrator** and add `-System`. Uninstall: `.\install.ps1 -Uninstall` (add `-ShortcutName "Meu Celular"` to also remove that shortcut and its icons).
 
 Parameter mapping: `--version → -Version`, `--prefix → -Prefix`, `--system → -System`, `--force → -Force`, `--no-checksum → -NoChecksum`, `--uninstall → -Uninstall`, `--shortcut-name → -ShortcutName`, `--scrcpy-args → -ScrcpyArgs`, `--icon-bg/fg/screen/eyes → -IconBg/-IconFg/-IconScreen/-IconEyes`, `--icon-url → -IconUrl`, `--shortcut-only → -ShortcutOnly` (`-NoDeps` is accepted as a no-op: the Windows prebuilt is self-contained).
 

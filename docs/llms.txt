@@ -3,7 +3,7 @@
 > Configure scrcpy via a web form and get a copyable oneliner that installs
 > scrcpy from the official Genymobile releases and creates a shortcut with
 > your settings and a recolored icon: a Linux `.desktop` file, or a Windows
-> `.bat` + `.lnk` pair in the Start Menu.
+> `.lnk` in the Start Menu (command baked directly into the shortcut).
 
 - Page: https://zonaro.github.io/scrcpy-installer/
 - Repo: https://github.com/zonaro/scrcpy-installer
@@ -47,9 +47,9 @@ Canonical form emitted by the page:
 4. Downloads the official scrcpy.svg icon, recolors it with the same 4 colors
    as Linux, saves <slug>.svg, and generates <slug>.ico (GDI+, no external
    converter) with the same colors for the shortcut.
-5. Writes the shortcut pair in the Start Menu (`scrcpy-installer` folder):
-   `<slug>.bat` (launches scrcpy.exe with the baked-in flags, `%*` passthrough)
-   + `<slug>.lnk` (points at the .bat, custom .ico, working dir = install dir).
+5. Writes the shortcut in the Start Menu (`scrcpy-installer` folder):
+   `<slug>.lnk` (TargetPath=scrcpy.exe, Arguments=baked-in flags,
+   custom .ico, working dir = install dir). No intermediate .bat launcher.
 
 Parameter mapping (same semantics, PowerShell naming): --version → -Version,
 --prefix → -Prefix, --system → -System, --force → -Force, --no-deps → -NoDeps
@@ -58,8 +58,9 @@ Parameter mapping (same semantics, PowerShell naming): --version → -Version,
 --scrcpy-args → -ScrcpyArgs, --icon-bg/fg/screen/eyes → -IconBg/-IconFg/
 -IconScreen/-IconEyes, --icon-url → -IconUrl, --shortcut-only → -ShortcutOnly.
 
-Alternative outputs: download the `.bat` launcher directly (for users who
-already have scrcpy installed) and the full setup as `scrcpy-setup.ps1`.
+Alternative outputs: the full setup as `scrcpy-setup.ps1`, and a standalone
+shortcut-creator `<slug>-atalho.ps1` (creates the same .lnk via WScript.Shell,
+for users who already have scrcpy installed).
 
 ## Supported scrcpy options (v3.3.4 + v4 delta)
 
@@ -137,26 +138,43 @@ The file input accepts an existing `.desktop` file. The parser reads:
 The preview embeds the byte-identical official
 `Genymobile/scrcpy @ master : app/data/scrcpy.svg`, except the recolorable
 shapes use presentation attributes + ids instead of `style="fill:..."`:
-`#pvBg` (frame, default #077063), `#pvFg` + `#pvAnt1/#pvAnt2` (body/antennas,
-default #30dd81), `#pvScreen` (lower screen, default #e4e4e4),
-`#pvEye1/#pvEye2` (eyes, default #ffffff). Shadows/highlights (#cccccc,
-opacity layers) are untouched. Live preview sets fill/stroke attributes.
+`#pvBg` (Tela/frame, default #077063), `#pvFg` + `#pvAnt1/#pvAnt2` (Corpo
+Android/body+antennas, default #30dd81), `#pvScreen` (Monitor/lower screen,
+default #e4e4e4), `#pvEye1/#pvEye2` (Olhos Android/eyes, default #ffffff).
+`#pvBase` (stand base, ex-#cccccc) has no input: it is derived in `update()`
+as `shadeHex(Monitor, 0.895)` so it always follows the Monitor proportionally
+(#e4e4e4 -> #cccccc by default). Other shadows/highlights (opacity layers)
+are untouched. Live preview sets fill/stroke attributes.
 `install.sh` does the equivalent server-side with case-insensitive
 `sed s/#077063/<bg>/gI` etc. on the downloaded SVG, so preview and installed
-icon always match.
+icon always match (except the auto-derived base, preview-only).
+
+Icon editor (NameToColor.js): `docs/index.html` loads
+`https://cdn.jsdelivr.net/gh/zonaro/NameToColor@main/NameToColor.js` +
+`NameToColor.ptBR.js` via plain `<script>` (offline = picker-only fallback
+with `#ntcWarn`). Each slot keeps its `<input type=color>` (source of truth,
+hex) plus a free-text input (`iconBgName/iconFgName/iconEyesName/
+iconScreenName`) resolved with `generateColor()` + `normalizeHex()`; hints
+show `hex · colorName()`. Mood palette (`#iconMood` grouped select with the
+69 canonical `generateThemePalette` themes + `#iconMoodName` free text +
+apply/shuffle buttons) calls `generateThemePalette(mood, 4)` and maps
+`[Tela, Corpo Android, Monitor, Olhos Android]` at once. Query params stay
+hex (`icon-bg|icon-fg|icon-screen|icon-eyes`) and also accept arbitrary names
+via `setIconColor()`.
 
 ## Page internals (for automation)
 
-- Single file `docs/index.html`, vanilla JS, no network calls at runtime.
+- Single file `docs/index.html`, vanilla JS, CDN: zonaro/NameToColor
+  (`NameToColor.js` + `NameToColor.ptBR.js` via jsdelivr, plain script tags).
 - i18n: `data-i18n` keys, `I18N = {en:{...}, es:{...}}`, pt-BR inline as
   fallback (`el.dataset.orig`), persisted `localStorage scrcpy-gen-lang`.
 - State: `QMAP` = [[query-flag, fieldId, type]] with types
   t(ext)|s(elect)|b(bool)|tv (tcpip flag+value); `buildArgs()` emits flags
   in stable order with shell quoting; `buildQuery()` inverts it for links.
 - Outputs: `#oneliner` (install+shortcut), `#desktopPrev` (.desktop text on
-  Linux, .bat text on Windows), shortcut download named `<slug>.desktop` /
-  `<slug>.bat`, installer download wrapping the oneliner as `scrcpy-setup.sh`
-  / `scrcpy-setup.ps1`.
+  Linux, .lnk Target/Arguments preview on Windows), shortcut download named
+  `<slug>.desktop` / `<slug>-atalho.ps1`, installer download wrapping the
+  oneliner as `scrcpy-setup.sh` / `scrcpy-setup.ps1`.
 - Windows branch: `isWin()` reads `#os`; `psSingle()` PowerShell-quotes args;
   `selVersion()` is shared by both branches; `#dlHint/#deskSum/#dlShortcutBtn/
   #dlBtn/#deskDir/#deskExt` are re-rendered per OS in `update()`.
