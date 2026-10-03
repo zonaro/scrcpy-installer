@@ -1,15 +1,17 @@
 # scrcpy-installer
 
-Install or update [scrcpy](https://github.com/Genymobile/scrcpy) on any Linux distribution from the **official GitHub releases** — no compilation, no `snap`, no `flatpak`.
+Install or update [scrcpy](https://github.com/Genymobile/scrcpy) on any Linux distribution **or Windows** from the **official GitHub releases** — no compilation, no `snap`, no `flatpak`, no `winget` lag.
 
-- Pulls the **latest** release automatically (or a specific version with `--version`)
-- Uses the official **prebuilt x86_64 binary** (glibc) when available; falls back to your distribution's package manager on other architectures or musl systems (Alpine)
+- Pulls the **latest** release automatically (or a specific version with `--version` / `-Version`)
+- Linux: uses the official **prebuilt x86_64 binary** (glibc) when available; falls back to your distribution's package manager on other architectures or musl systems (Alpine)
+- Windows: uses the official **prebuilt `scrcpy-win64` / `scrcpy-win32` zip** (both arches covered, no fallback needed)
 - Verifies the download with the official **SHA256** checksums
-- **Idempotent**: re-running the command updates scrcpy to the newest release (asks for confirmation first when an older version is installed; `--force` skips the prompt)
+- **Idempotent**: re-running the command updates scrcpy to the newest release (asks for confirmation first when an older version is installed; `--force` / `-Force` skips the prompt)
 - The `scrcpy` command shortcut is **always recreated**, even when the version is already up to date
-- Optional **desktop shortcuts** (`.desktop` + custom SVG icon) per device, with baked-in `scrcpy` arguments
-- Installs `scrcpy` (and a bundled `adb` when you don't have one) so it works from anywhere in your terminal
-- Can be run as a **normal user** (installs to `~/.local`) or **system-wide** (installs to `/usr/local`)
+- Optional **shortcuts** per device, with baked-in `scrcpy` arguments and a recolored icon: `.desktop` + custom SVG icon on Linux, `.bat` + `.lnk` (Start Menu) + custom `.ico` on Windows
+- Can be run as a **normal user** (Linux: `~/.local`; Windows: `%LOCALAPPDATA%\scrcpy`) or **system-wide** (Linux: `/usr/local`; Windows: `%ProgramFiles%\scrcpy`)
+
+> Prefer the visual way? The [web generator](https://zonaro.github.io/scrcpy-installer/) builds the command for you (Linux + Windows, PT-BR/EN/ES).
 
 ---
 
@@ -57,7 +59,34 @@ curl -fsSL https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/instal
 
 ---
 
-## Desktop shortcut
+## Windows (PowerShell)
+
+Same behavior as Linux, via `install.ps1` — downloads the official `scrcpy-win64` (or `win32`) zip, verifies SHA256, extracts to `%LOCALAPPDATA%\scrcpy`, registers it on your user PATH, and optionally creates a Start Menu shortcut pair (`.bat` launcher + `.lnk` with a custom `.ico` in your colors).
+
+```powershell
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/install.ps1 -OutFile install.ps1
+.\install.ps1
+```
+
+With a shortcut (equivalent of `--shortcut-name` + `--scrcpy-args`):
+
+```powershell
+.\install.ps1 -ShortcutName "Meu Celular" -ScrcpyArgs "--max-size 1024 --no-audio"
+```
+
+One-liner without touching disk:
+
+```powershell
+& ([scriptblock]::Create((Invoke-RestMethod https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/install.ps1))) -ShortcutName "Meu Celular"
+```
+
+> System-wide instead (`%ProgramFiles%\scrcpy`): run PowerShell **as Administrator** and add `-System`. Uninstall: `.\install.ps1 -Uninstall` (add `-ShortcutName "Meu Celular"` to also remove that shortcut pair and its icons).
+
+Parameter mapping: `--version → -Version`, `--prefix → -Prefix`, `--system → -System`, `--force → -Force`, `--no-checksum → -NoChecksum`, `--uninstall → -Uninstall`, `--shortcut-name → -ShortcutName`, `--scrcpy-args → -ScrcpyArgs`, `--icon-bg/fg/screen/eyes → -IconBg/-IconFg/-IconScreen/-IconEyes`, `--icon-url → -IconUrl`, `--shortcut-only → -ShortcutOnly` (`-NoDeps` is accepted as a no-op: the Windows prebuilt is self-contained).
+
+---
+
+## Desktop shortcut (Linux)
 
 Create a launcher entry with a custom name, baked-in arguments and a recolored icon — handy when you have more than one phone:
 
@@ -155,7 +184,9 @@ The layout keeps `scrcpy`, `scrcpy-server`, `adb` and the icons together, so the
 | Linux x86_64 (glibc) | Official prebuilt (recommended, always up to date) |
 | Linux aarch64/arm64 | Distribution package manager fallback |
 | Linux x86_64 (musl/Alpine) | Distribution package manager fallback (`apk add scrcpy`) |
-| Other architectures | Distribution package manager fallback, or [build from source](https://github.com/Genymobile/scrcpy/blob/master/INSTALL.md) |
+| Other Linux architectures | Distribution package manager fallback, or [build from source](https://github.com/Genymobile/scrcpy/blob/master/INSTALL.md) |
+| Windows x64 | Official prebuilt `scrcpy-win64-*.zip` via `install.ps1` |
+| Windows x86 (32-bit) | Official prebuilt `scrcpy-win32-*.zip` via `install.ps1` |
 
 ## Troubleshooting
 
