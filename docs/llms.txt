@@ -10,8 +10,13 @@
 - Installer (Linux): https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/install.sh
 - Installer (Windows): https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/install.ps1
 - Languages: pt-BR (default), en, es — persisted in localStorage, auto-detected
-- Privacy: the form runs 100% client-side (vanilla JS, no CDN, no analytics).
-  State is serialized only into the URL #hash locally. No data leaves the browser.
+- Privacy: the form runs 100% client-side (vanilla JS, no analytics).
+  CDN: zonaro/NameToColor (plain script) + Tango ya-webadb ESM
+  (@yume-chan/adb@2.6.4, adb-daemon-webusb@2.3.2, adb-credential-web@2.1.0
+  via jsdelivr `+esm`, inside `<script type="module">` only).
+  State is serialized only into the URL #hash locally. WebADB traffic is
+  local USB only (RSA key in browser IndexedDB `Tango`); no data leaves
+  the browser.
 - OS toggle: the form has a Linux/Windows selector (`os`, also `?os=windows`
   deep link). It switches the oneliner, the shortcut preview and the downloads.
 
@@ -141,9 +146,9 @@ shapes use presentation attributes + ids instead of `style="fill:..."`:
 `#pvBg` (Tela/frame, default #077063), `#pvFg` + `#pvAnt1/#pvAnt2` (Corpo
 Android/body+antennas, default #30dd81), `#pvScreen` (Monitor/lower screen,
 default #e4e4e4), `#pvEye1/#pvEye2` (Olhos Android/eyes, default #ffffff).
-`#pvBase` (stand base, ex-#cccccc) has no input: it is derived in `update()`
-as `shadeHex(Monitor, 0.895)` so it always follows the Monitor proportionally
-(#e4e4e4 -> #cccccc by default). Other shadows/highlights (opacity layers)
+`#pvBase` (stand base, ex-#cccccc) has no input: `update()` sets
+`pvBase.style.fill = pvBase.fill = Monitor` so it always follows the Monitor
+with the exact same color. Other shadows/highlights (opacity layers)
 are untouched. Live preview sets fill/stroke attributes.
 `install.sh` does the equivalent server-side with case-insensitive
 `sed s/#077063/<bg>/gI` etc. on the downloaded SVG, so preview and installed
@@ -152,15 +157,80 @@ icon always match (except the auto-derived base, preview-only).
 Icon editor (NameToColor.js): `docs/index.html` loads
 `https://cdn.jsdelivr.net/gh/zonaro/NameToColor@main/NameToColor.js` +
 `NameToColor.ptBR.js` via plain `<script>` (offline = picker-only fallback
-with `#ntcWarn`). Each slot keeps its `<input type=color>` (source of truth,
+with `#ntcWarn`). Layout in `#s-icon`: mood row FIRST (grouped `#iconMood`
+select with the 69 canonical themes, free-text `#iconMoodName`, apply +
+shuffle buttons), then the 4 color fields (order: Tela, Corpo Android, Olhos
+Android, Monitor). Each slot keeps its `<input type=color>` (source of truth,
 hex) plus a free-text input (`iconBgName/iconFgName/iconEyesName/
 iconScreenName`) resolved with `generateColor()` + `normalizeHex()`; hints
-show `hex · colorName()`. Mood palette (`#iconMood` grouped select with the
-69 canonical `generateThemePalette` themes + `#iconMoodName` free text +
-apply/shuffle buttons) calls `generateThemePalette(mood, 4)` and maps
-`[Tela, Corpo Android, Monitor, Olhos Android]` at once. Query params stay
+show `hex · colorName()` in the page locale (pt-BR via the pack, en natively,
+es falls back to en). Mood palette calls `generateThemePalette(resolveTheme
+(mood), 4)` and maps `[Tela, Corpo Android, Monitor, Olhos Android]` at once;
+`resolveTheme()` matches canonical names plus every `themeAliases` pt alias
+from the pack (accent-insensitive, e.g. "por do sol" -> Sunset). Select
+option text uses the pack too (`moodNames` first, then first `themeAliases`
+entry capitalized) when LANG=pt; option values stay canonical English.
+i18n: every new string has pt (inline `orig`) + en + es entries
+(`f_icon*`, `b_mood`, `ph_mood`, `ph_colorbg/fg/eyes/screen`, `t_shuffle`
+via `data-i18n-title`, `a_mood`, `ntc_offline`, `g_moods/nature/materials/
+audience/occasions/styles/industry`); `applyLang()` handles `data-i18n`,
+`data-i18n-ph` and `data-i18n-title`, and `buildMoodSelect()` re-localizes
+optgroups/options/aria-label on language change. Query params stay
 hex (`icon-bg|icon-fg|icon-screen|icon-eyes`) and also accept arbitrary names
 via `setIconColor()`.
+
+## Form widgets (toggles, presets, autocomplete)
+
+- Booleans render as toggle switches: `.checkrow input[type=checkbox]`
+  styled with `appearance:none` (44x24 pill, sliding knob). Same DOM/ids,
+  so `checked(id)`, QMAP type `b`, `restore()` and `buildArgs()` are untouched.
+- Preset+free-text fields use `input + datalist` (select-like dropdown that
+  still accepts custom values, keeping `val(id)`/`setField(..., "t")` intact):
+  `#maxSize` (#maxSizeList: 640/720/1024/1280/1920/2560),
+  `#bitrate` (#bitrateList: 2M/4M/8M/12M/16M/25M),
+  `#abitrate` (#abitrateList: 32K/64K/128K/192K/256K),
+  `#encoder` (#encoderList: OMX.google/c2 encoders),
+  `#port` (#portList: 27183, 27183:27199),
+  `#shortcutMod` (#shortcutModList), `#pushTarget` (#pushTargetList:
+  /sdcard/Download/, Movies/, DCIM/), `#camSize` (#camSizeList),
+  `#newDisplay` (#newDisplayList), `#bgColor` (#bgColorList).
+  Strict enums stay real `<select>` (codec, video-source, audio-source,
+  keyboard/mouse/gamepad, record-format, camera-facing, render-fit,
+  capture-orientation).
+
+## WebADB device panel (USB only, Chromium desktop + HTTPS)
+
+- Section `#s-adb`: buttons `#adbConnect` (requestDevice), `#adbRefresh`
+  (granted devices), `#adbTcpip` (tcpip all connected), checkbox
+  `#adbAutoTcpip` (auto wireless on connect), status `#adbStatus`,
+  list `#adbList`. Non-Chromium/no-WebUSB disables the buttons with
+  `adb_no_usb`. Classic-script helpers on `window` (`__adbStore`,
+  `__adbSetStatus/__adbRenderList/__adbUpdateDatalists`, `window.ScrGen.t`
+  bridge for i18n) so the ESM module manipulates the same state.
+- Connect flow (module script): `AdbDaemonWebUsbDeviceManager.BROWSER` +
+  `AdbWebCredentialStore("ScrcpyInstaller")` -> `requestDevice()` (user
+  gesture, `undefined` = cancel) -> `device.connect()` ->
+  `AdbDaemonTransport.authenticate()` (blocks until the phone taps Allow)
+  -> `new Adb(transport)`. Info via `subprocess.noneProtocol.spawnWaitText`:
+  model `getprop ro.product.model`, IPs `ip -f inet addr show scope global`
+  (fallback `ip -4 -o addr show scope global`, parses `inet X`, drops 127.*),
+  apps `cmd package query-activities --brief -a MAIN -c LAUNCHER`
+  (fallback `pm list packages -3`, then full `pm list packages`).
+- Serial/IP autocomplete: `#serialList`/`#tcpipList` datalists rebuilt from
+  `__adbStore.devices` (serial + `ip`/`ip:5555` with model labels); device
+  cards have `usar` buttons filling `#serial` / `#tcpip` (+`#tcpipFlag`).
+- Wireless: IP is read BEFORE `adb.tcpip.setPort(5555)` (USB link dies on
+  restart — the throw is expected/tolerated), then `adb.close()` and the UI
+  shows `adb connect IP:5555`. No Wi-Fi reconnect from the page (no raw TCP
+  in browsers; Tango needs a native bridge).
+- `--start-app` autocomplete: `#startApp` + `#appSuggest` custom dropdown
+  (classic script, no imports). Merged+deduped `__adbStore.pkgs`
+  (`{pkg, device}`), substring match, launchable-first ordering, max 30,
+  mouse+ArrowUp/Down+Enter+Escape, preserves scrcpy `+`/`?` prefixes on pick.
+  i18n keys: `s_adb/h_adb/b_adbadd/b_adbrefresh/b_adbtcpip/f_autotcpip/
+  h_autotcpip/h_adbpriv/h_startapp/adb_no_usb/adb_cancel/adb_need_gesture/
+  adb_authorize/adb_busy/adb_lost/adb_connected/adb_ip_none/adb_tcpip_ok/
+  adb_use/adb_apps/adb_no_apps/adb_no_dev` (pt inline + en + es).
 
 ## Page internals (for automation)
 
