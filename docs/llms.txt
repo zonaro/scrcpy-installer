@@ -43,8 +43,10 @@ Canonical form emitted by the page:
 `& ([scriptblock]::Create((Invoke-RestMethod 'https://raw.githubusercontent.com/zonaro/scrcpy-installer/main/install.ps1'))) -ShortcutName 'Name' -ScrcpyArgs '<scrcpy flags>' [-Version <tag>] [-IconBg/-IconFg/-IconScreen/-IconEyes <#hex>]`
 
 1. Downloads the official prebuilt `scrcpy-win64-<version>.zip`
-   (64-bit OS) or `scrcpy-win32-<version>.zip` (32-bit OS) — both arches have
-   official prebuilts, so there is no package-manager fallback.
+   (64-bit OS), `scrcpy-winarm64-<version>.zip` (ARM64 OS, v5.0+), or
+   `scrcpy-win32-<version>.zip` (32-bit OS) — all arches have
+   official prebuilts, so there is no package-manager fallback. For versions
+   older than v5.0 on ARM64, the win64 build runs under x64 emulation.
 2. Verifies SHA256 against the official SHA256SUMS.txt.
 3. Extracts to %LOCALAPPDATA%\scrcpy\lib\scrcpy\<version>
    (or %ProgramFiles%\scrcpy with -System, needs elevation) and registers that
@@ -67,12 +69,13 @@ Alternative outputs: the full setup as `scrcpy-setup.ps1`, and a standalone
 shortcut-creator `<slug>-atalho.ps1` (creates the same .lnk via WScript.Shell,
 for users who already have scrcpy installed).
 
-## Supported scrcpy options (v3.3.4 + v4 delta)
+## Supported scrcpy options (v3.3.4 + v4 delta + v5 delta)
 
 Connection: --serial, --select-usb/-d, --select-tcpip/-e, --tcpip, --port/-p.
 Video: --max-size/-m, --video-bit-rate/-b, --max-fps, --video-codec
 (h264|h265|av1), --video-encoder, --video-source (display|camera),
---display-id, --capture-orientation, --crop, --no-video.
+--display-id, --capture-orientation, --crop, --no-video,
+--hwdec (auto|disabled|vaapi on Linux|d3d11va on Windows).
 Window: --fullscreen/-f, --no-window, --always-on-top, --window-borderless,
 --window-title, --window-width/--window-height, --disable-screensaver, --print-fps.
 Audio: --no-audio, --audio-codec (opus|aac|flac|raw), --audio-bit-rate,
@@ -88,6 +91,7 @@ Device: --otg, --stay-awake/-w, --turn-screen-off/-S, --show-touches/-t,
 --power-off-on-close, --time-limit.
 v4-only: --flex-display/-x, --render-fit, --keep-active, --background-color,
 --camera-torch.
+v5-only: --hwdec.
 
 Validation rules enforced with warnings: --prefer-text XOR --raw-key-events
 (sdk keyboard only); --mouse=sdk needs video playback; --audio-dup needs
@@ -113,14 +117,14 @@ Every scrcpy long flag works as a query param WITHOUT the leading `--`.
 Booleans are bare: `?no-audio&fullscreen&stay-awake`.
 Valued flags use `=`: `?max-size=1024&video-codec=h265&window-title=TV`.
 Extra params (not scrcpy flags):
-`shortcut-name`, `version` (latest|v4.1|v3.3.4|any other tag),
+`shortcut-name`, `version` (latest|v5.0|v4.1|v3.3.4|any other tag),
 `K|M|G` (bare = physical keyboard/mouse/gamepad),
 `icon-bg|icon-fg|icon-screen|icon-eyes` (hex, same defaults as installer),
 `os` (linux|windows — selects the installer variant in the page; auto-detected
 from the browser when absent, explicit `?os=` / manual toggle wins and is
 remembered in localStorage `scrcpy-gen-os`).
 Full example:
-`?shortcut-name=TV&version=v4.1&max-size=1024&no-audio&video-codec=h265&fullscreen&icon-bg=%23000000`
+`?shortcut-name=TV&version=v5.0&max-size=1024&no-audio&video-codec=h265&fullscreen&icon-bg=%23000000`
 Precedence on load: `#hash` state first, then query string (query wins),
 then live edits. The "Copy link of this config" button serializes the
 current form back into this exact format (canonical page URL + `?` + params).

@@ -176,6 +176,7 @@ The layout keeps `scrcpy`, `scrcpy-server`, `adb` and the icons together, so the
 - `curl` (or `wget`), `tar` and `sha256sum` — present on virtually every Linux system
 - `libudev.so.1` — ships with systemd/eudev on all mainstream distros; the script tries to install it if missing
 - The official prebuilt requires **glibc**: on musl systems (e.g. Alpine) the script installs from the package manager instead
+- **Hardware video decoding (v5.0+, enabled by default)** — scrcpy v5.0 uses hardware decoding when available and falls back to software decoding automatically. On Linux this benefits from a VA-API driver (`mesa-va-drivers` or `va-driver-all` on Debian/Ubuntu; other distros may use different package names). This is **optional** — the installer never requires it and scrcpy works fine without it.
 
 ## Supported platforms
 
@@ -186,6 +187,7 @@ The layout keeps `scrcpy`, `scrcpy-server`, `adb` and the icons together, so the
 | Linux x86_64 (musl/Alpine) | Distribution package manager fallback (`apk add scrcpy`) |
 | Other Linux architectures | Distribution package manager fallback, or [build from source](https://github.com/Genymobile/scrcpy/blob/master/INSTALL.md) |
 | Windows x64 | Official prebuilt `scrcpy-win64-*.zip` via `install.ps1` |
+| Windows ARM64 | Official prebuilt `scrcpy-winarm64-*.zip` via `install.ps1` (v5.0+); win64 runs under x64 emulation on older versions |
 | Windows x86 (32-bit) | Official prebuilt `scrcpy-win32-*.zip` via `install.ps1` |
 
 ## Troubleshooting
@@ -194,6 +196,7 @@ The layout keeps `scrcpy`, `scrcpy-server`, `adb` and the icons together, so the
 - **`ERROR: Could not find any ADB device`** — enable USB debugging on the device, authorize the RSA fingerprint, and check `adb devices`. If no system `adb` exists, the installer ships the one bundled with scrcpy.
 - **`error while loading shared libraries: libudev.so.1`** — install `libudev1` (Debian/Ubuntu), `systemd-libs` (Fedora) or `libudev1` (openSUSE).
 - **Alpine** — the official prebuilt is glibc-only; the installer detects musl and uses `apk add scrcpy` instead.
+- **Hardware decoding issues (v5.0+)** — scrcpy v5.0 enables hardware decoding by default. If video is corrupted, flickers, or the GPU driver misbehaves, pass `--hwdec=disabled` to force software decoding.
 - **Why not snap/flatpak?** — this installs the upstream binary directly, tracking official releases as soon as they're published.
 
 ## License
