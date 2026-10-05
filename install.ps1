@@ -410,9 +410,35 @@ try {
     exit 0
   }
 
-  # ---------------------------------------------------------------- arch detection (both have official prebuilts)
-  if ([Environment]::Is64BitOperatingSystem) { $AssetArch = "win64" }
+  # ---------------------------------------------------------------- arch detection
+  function Get-ScrcpyVersionParts([string]$Tag) {
+    if ($Tag -notmatch '^v?(\d+)(?:\.(\d+))?(?:\.(\d+))?') { return $null }
+    $p = @($Matches[1], $Matches[2], $Matches[3]) | ForEach-Object { if ($_ -eq "") { 0 } else { [int]$_ } }
+    return ,$p
+  }
+
+  # native ARM64 prebuilts only exist from scrcpy v5.0 on, so an older pinned
+  # release has to fall back to win64; an unparseable tag is left alone
+  function Test-ScrcpyVersionAtLeast([string]$Tag, [int]$Major, [int]$Minor) {
+    $p = Get-ScrcpyVersionParts $Tag
+    if (-not $p) { return $true }
+    if ($p[0] -ne $Major) { return $p[0] -gt $Major }
+    return $p[1] -ge $Minor
+  }
+
+  # an x64 PowerShell emulated on Windows ARM64 reports AMD64 here, and the real
+  # architecture shows up in PROCESSOR_ARCHITEW6432 instead
+  $nativeArch = $env:PROCESSOR_ARCHITEW6432
+  if ([string]::IsNullOrWhiteSpace($nativeArch)) { $nativeArch = $env:PROCESSOR_ARCHITECTURE }
+  if ($nativeArch -and ($nativeArch -ieq "ARM64")) { $AssetArch = "winarm64" }
+  elseif ([Environment]::Is64BitOperatingSystem) { $AssetArch = "win64" }
   else { $AssetArch = "win32" }
+
+  if (($AssetArch -eq "winarm64") -and -not [string]::IsNullOrWhiteSpace($Version) -and
+      -not (Test-ScrcpyVersionAtLeast $Version 5 0)) {
+    Write-Info "native ARM64 prebuilts start at scrcpy v5.0; using win64 for $Version"
+    $AssetArch = "win64"
+  }
 
   if ($NoDeps) { Write-Info "-NoDeps: nothing to skip on Windows (prebuilt is self-contained)" }
 
@@ -424,6 +450,11 @@ try {
     $Version = $rel.tag_name
     if ([string]::IsNullOrWhiteSpace($Version)) { Fail "could not determine the latest release tag from $ApiUrl" }
     $asset = $rel.assets | Where-Object { $_.name -like "scrcpy-$AssetArch-*.zip" } | Select-Object -First 1
+    if ((-not $asset) -and ($AssetArch -eq "winarm64")) {
+      Write-Info "release $Version ships no winarm64 prebuilt; falling back to win64"
+      $AssetArch = "win64"
+      $asset = $rel.assets | Where-Object { $_.name -like "scrcpy-win64-*.zip" } | Select-Object -First 1
+    }
     if (-not $asset) { Fail "no $AssetArch prebuilt asset found for latest release $Version" }
     $AssetUrl = $asset.browser_download_url
   } else {
