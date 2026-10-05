@@ -397,6 +397,37 @@ if [ "$NO_DEPS" -eq 0 ]; then
             *)      warn "install libudev manually if scrcpy fails to start" ;;
         esac
     fi
+
+    # scrcpy v5.0 decodes video in hardware by default and silently falls back
+    # to software when no driver is available, so a VA-API driver is a
+    # nice-to-have, never a requirement
+    vaapi="unknown"
+    if [ ! -e /dev/dri/renderD128 ]; then
+        vaapi="no"
+    elif ! command -v vainfo >/dev/null 2>&1; then
+        # on Wayland this node exists even with no VA-API driver installed, so
+        # it is only a hint; without vainfo we cannot confirm anything
+        vaapi="unknown"
+    elif vainfo >/dev/null 2>&1; then
+        vaapi="yes"
+    else
+        vaapi="no"
+    fi
+
+    case "$vaapi" in
+        yes) info "hardware decoding: VA-API driver detected" ;;
+        no)
+            info "no VA-API driver found; scrcpy v5.0 will decode in software"
+            case $(detect_pm) in
+                apt)    pm_install mesa-va-drivers || true ;;
+                dnf)    pm_install mesa-va-drivers || pm_install intel-media-driver || true ;;
+                pacman) pm_install mesa || true ;;
+                *)      warn "no known VA-API driver package for your distro — see your GPU vendor docs" ;;
+            esac
+            ;;
+        *)  warn "could not confirm a VA-API driver; scrcpy v5.0 falls back to software decoding on its own" ;;
+    esac
+    info "force software decoding any time with: scrcpy --hwdec=disabled"
 fi
 
 # ---------------------------------------------------------------- download + checksum
@@ -462,7 +493,7 @@ fi
 if [ -x "$BIN_DIR/scrcpy" ]; then
     "$BIN_DIR/scrcpy" --version
     info "${C_CYAN}scrcpy $VERSION installed successfully.${C_RESET}"
-    [ "$NO_DEPS" -eq 1 ] && warn "dependencies were skipped (--no-deps): make sure adb and libudev are available"
+    [ "$NO_DEPS" -eq 1 ] && warn "dependencies were skipped (--no-deps): make sure adb and libudev are available (a VA-API driver is optional)"
 else
     die "installation failed: $BIN_DIR/scrcpy is missing"
 fi
