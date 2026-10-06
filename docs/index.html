@@ -212,9 +212,7 @@ footer a{color:var(--accent)}
     <div class="adbbar">
       <button id="adbConnect" type="button" data-i18n="b_adbadd">＋ Detectar dispositivo USB</button>
       <button id="adbRefresh" type="button" class="ghost" data-i18n="b_adbrefresh">Atualizar</button>
-      <button id="adbTcpip" type="button" class="ghost" data-i18n="b_adbtcpip">Ativar Wi-Fi (tcpip :5555)</button>
     </div>
-    <div class="field"><label class="checkrow"><input type="checkbox" id="adbAutoTcpip"> <span data-i18n="f_autotcpip">Iniciar adb via wireless automaticamente</span> <code>tcpip:5555</code></label><small data-i18n="h_autotcpip">Ao conectar, lê o IP e ativa o modo TCP/IP (o USB cai; use adb connect IP:5555 depois)</small></div>
     <div id="adbStatus" role="status"></div>
     <div id="adbList"></div>
     <p class="hint" style="margin-top:8px" data-i18n="h_adbpriv">Tudo local: a chave RSA fica no IndexedDB do seu navegador; nenhum dado sai daqui. Feche adb.exe/Android Studio antes (só 1 conexão por vez).</p>
@@ -428,8 +426,8 @@ p_api1:"Any scrcpy parameter can come from the query string using the long flag 
 p_api2:"Desktop upload: the form reads Name= and Exec= from an existing shortcut (long flags with = or space, plus shorthands -d -e -m -b -f -n -K -M -G -w -S -t -x -s -p -r), fills the fields and reports what was skipped. Icon colors cannot be recovered from the SVG.",
 p_api3:"Files: install.sh (Linux) and install.ps1 (Windows) accept the same parameters — --shortcut-name/-ShortcutName, --scrcpy-args/-ScrcpyArgs, --icon-bg/-IconBg (-fg/-screen/-eyes), --icon-url/-IconUrl and --shortcut-only/-ShortcutOnly. On Linux the icon is the official scrcpy.svg recolored via sed; on Windows the installer saves the same recolored SVG and generates an .ico with the same colors for the .lnk. Shortcut: .desktop on Linux, .lnk in the Start Menu on Windows. AI docs live in llms.txt. The form never sends data: everything runs in the browser.",
 b_link:"Copy link of this config",
-s_adb:"Devices (WebADB over USB)",h_adb:"Plug the phone via USB with USB debugging on. Chrome/Edge desktop (HTTPS) detects serial, IP and apps to autocomplete the form.",b_adbadd:"+ Detect USB device",b_adbrefresh:"Refresh",b_adbtcpip:"Enable Wi-Fi (tcpip :5555)",f_autotcpip:"Auto-start adb over wireless",h_autotcpip:"On connect, reads the IP and enables TCP/IP mode (USB drops; then use adb connect IP:5555)",h_adbpriv:"All local: the RSA key stays in your browser IndexedDB; nothing leaves here. Close adb.exe/Android Studio first (only 1 connection at a time).",h_startapp:"Type to search; Enter uses the package. Prefixes: + force-stop, ? match by name.",
-adb_no_usb:"WebUSB needs Chrome/Edge/Opera on desktop (HTTPS).",adb_cancel:"Cancelled — no device chosen.",adb_need_gesture:"Click the button to open the USB picker.",adb_authorize:"Check the phone screen — tap “Allow USB debugging”…",adb_busy:"Device busy — close adb.exe / Android Studio / other tabs and retry.",adb_lost:"Cable unplugged or device re-enumerated.",adb_switching:"Switching to TCP/IP… (USB will drop — that's normal).",adb_connected:"connected",adb_ip_none:"IP not found — connect to Wi-Fi first.",adb_tcpip_ok:"Wi-Fi ADB enabled. Now run:",adb_use:"use",adb_apps:"apps",adb_no_apps:"No apps listed yet — connect a device.",adb_no_dev:"No device with permission yet — click Detect.",
+ s_adb:"Devices (WebADB over USB)",h_adb:"Plug the phone via USB with USB debugging on. Chrome/Edge desktop (HTTPS) detects serial, IP and apps to autocomplete the form.",b_adbadd:"+ Detect USB device",b_adbrefresh:"Refresh",h_adbpriv:"All local: the RSA key stays in your browser IndexedDB; nothing leaves here. Close adb.exe/Android Studio first (only 1 connection at a time).",h_startapp:"Type to search; Enter uses the package. Prefixes: + force-stop, ? match by name.",
+ adb_no_usb:"WebUSB needs Chrome/Edge/Opera on desktop (HTTPS).",adb_cancel:"Cancelled — no device chosen.",adb_need_gesture:"Click the button to open the USB picker.",adb_authorize:"Check the phone screen — tap “Allow USB debugging”…",adb_busy:"Device busy — close adb.exe / Android Studio / other tabs and retry.",adb_lost:"Cable unplugged or device re-enumerated.",adb_connected:"connected",adb_use:"use",adb_apps:"apps",adb_no_apps:"No apps listed yet — connect a device.",adb_no_dev:"No device with permission yet — click Detect.",
 t_doc:"Open official scrcpy docs in a new tab",
 up_skip:"Skipped: ",up_noexec:"No Exec= line found",up_empty:"No Name=/Exec= found",up_icon:"icon colors are not imported"},
 es:{gen:"— generador de comandos",sub:"Configure scrcpy con el formulario. Al final, un comando copiable instala scrcpy desde el repo oficial, lo añade al PATH y crea un acceso con su configuración e icono personalizado (.desktop en Linux, .lnk en Windows).",
@@ -463,8 +461,8 @@ p_api1:"Cualquier parámetro de scrcpy puede venir en la query string con el nom
 p_api2:"Subida de .desktop: el formulario lee Name= y Exec= de un acceso existente (flags largas con = o espacio, más atajos -d -e -m -b -f -n -K -M -G -w -S -t -x -s -p -r), completa los campos e informa lo omitido. Los colores del icono no se recuperan del SVG.",
 p_api3:"Archivos: install.sh (Linux) e install.ps1 (Windows) aceptan los mismos parámetros — --shortcut-name/-ShortcutName, --scrcpy-args/-ScrcpyArgs, --icon-bg/-IconBg (-fg/-screen/-eyes), --icon-url/-IconUrl y --shortcut-only/-ShortcutOnly. En Linux el icono es el scrcpy.svg oficial recolorido vía sed; en Windows el instalador guarda el mismo SVG recolorido y genera un .ico con los mismos colores para el .lnk. Acceso: .desktop en Linux, .lnk en el Menú Inicio en Windows. Docs para IA en llms.txt. El formulario nunca envía datos: todo corre en el navegador.",
 b_link:"Copiar enlace de esta config",
-s_adb:"Dispositivos (WebADB por USB)",h_adb:"Conecte el teléfono por USB con depuración USB activada. Chrome/Edge de escritorio (HTTPS) detecta serial, IP y apps para autocompletar.",b_adbadd:"+ Detectar dispositivo USB",b_adbrefresh:"Actualizar",b_adbtcpip:"Activar Wi-Fi (tcpip :5555)",f_autotcpip:"Iniciar adb por wireless automáticamente",h_autotcpip:"Al conectar, lee la IP y activa el modo TCP/IP (el USB cae; luego use adb connect IP:5555)",h_adbpriv:"Todo local: la clave RSA queda en el IndexedDB de su navegador; nada sale de aquí. Cierre adb.exe/Android Studio antes (solo 1 conexión a la vez).",h_startapp:"Escriba para buscar; Enter usa el paquete. Prefijos: + forzar-stop, ? buscar por nombre.",
-adb_no_usb:"WebUSB necesita Chrome/Edge/Opera en escritorio (HTTPS).",adb_cancel:"Cancelado — ningún dispositivo elegido.",adb_need_gesture:"Haga clic en el botón para abrir el selector USB.",adb_authorize:"Revise la pantalla del teléfono — toque “Permitir depuración USB”…",adb_busy:"Dispositivo ocupado — cierre adb.exe / Android Studio / otras pestañas e intente de nuevo.",adb_lost:"Cable desconectado o dispositivo re-enumerado.",adb_switching:"Cambiando a TCP/IP… (el USB se caerá — es normal).",adb_connected:"conectado",adb_ip_none:"IP no encontrada — conéctese al Wi-Fi primero.",adb_tcpip_ok:"ADB por Wi-Fi activado. Ahora ejecute:",adb_use:"usar",adb_apps:"apps",adb_no_apps:"Sin apps listadas aún — conecte un dispositivo.",adb_no_dev:"Sin dispositivo con permiso aún — haga clic en Detectar.",
+ s_adb:"Dispositivos (WebADB por USB)",h_adb:"Conecte el teléfono por USB con depuración USB activada. Chrome/Edge de escritorio (HTTPS) detecta serial, IP y apps para autocompletar.",b_adbadd:"+ Detectar dispositivo USB",b_adbrefresh:"Actualizar",h_adbpriv:"Todo local: la clave RSA queda en el IndexedDB de su navegador; nada sale de aquí. Cierre adb.exe/Android Studio antes (solo 1 conexión a la vez).",h_startapp:"Escriba para buscar; Enter usa el paquete. Prefijos: + forzar-stop, ? buscar por nombre.",
+ adb_no_usb:"WebUSB necesita Chrome/Edge/Opera en escritorio (HTTPS).",adb_cancel:"Cancelado — ningún dispositivo elegido.",adb_need_gesture:"Haga clic en el botón para abrir el selector USB.",adb_authorize:"Revise la pantalla del teléfono — toque “Permitir depuración USB”…",adb_busy:"Dispositivo ocupado — cierre adb.exe / Android Studio / otras pestañas e intente de nuevo.",adb_lost:"Cable desconectado o dispositivo re-enumerado.",adb_connected:"conectado",adb_use:"usar",adb_apps:"apps",adb_no_apps:"Sin apps listadas aún — conecte un dispositivo.",adb_no_dev:"Sin dispositivo con permiso aún — haga clic en Detectar.",
 t_doc:"Abrir la documentación oficial de scrcpy en una pestaña nueva",
 up_skip:"Omitidas: ",up_noexec:"Sin línea Exec=",up_empty:"Sin Name=/Exec=",up_icon:"colores del icono no se importan"}
 };
@@ -564,7 +562,7 @@ function buildArgs(){
   return a.join(" ");
 }
 function T(k){var d=I18N[LANG]||{};return d[k]||PT[k]||k;}
-var PT={t_doc:"Abrir documentação oficial do scrcpy em nova aba",v_excl:"--prefer-text e --raw-key-events são mutuamente exclusivos.",v_sdk:"--prefer-text/--raw-key-events exigem --keyboard=sdk.",v_mouse:"--mouse=sdk requer playback de vídeo (desmarque --no-video ou use uhid).",v_dup:"--audio-dup exige --audio-source=playback.",v_cam:"Opções de câmera exigem fonte = camera (aplicado automaticamente).",v_verreq:"As flags marcadas exigem scrcpy v{v} ou superior.",v_hwdec:"--hwdec precisa de reprodução de vídeo ativa; desmarque --no-video.",v_otg:"--otg desabilita espelhamento; conflita com fonte camera.",copied:"Copiado!",s_adb:"Dispositivos (WebADB via USB)",h_adb:"Conecte o celular por USB com depuração USB ativada. Chrome/Edge desktop (HTTPS) detecta serial, IP e apps para autocompletar o formulário.",b_adbadd:"＋ Detectar dispositivo USB",b_adbrefresh:"Atualizar",b_adbtcpip:"Ativar Wi-Fi (tcpip :5555)",f_autotcpip:"Iniciar adb via wireless automaticamente",h_autotcpip:"Ao conectar, lê o IP e ativa o modo TCP/IP (o USB cai; use adb connect IP:5555 depois)",h_adbpriv:"Tudo local: a chave RSA fica no IndexedDB do seu navegador; nenhum dado sai daqui. Feche adb.exe/Android Studio antes (só 1 conexão por vez).",h_startapp:"Digite para buscar; Enter usa o pacote. Prefixos: + força-stop, ? busca por nome.",adb_no_usb:"WebUSB precisa de Chrome/Edge/Opera no desktop (HTTPS).",adb_cancel:"Cancelado — nenhum dispositivo escolhido.",adb_need_gesture:"Clique no botão para abrir o seletor USB.",adb_authorize:"Olhe a tela do celular — toque em “Permitir depuração USB”…",adb_busy:"Dispositivo ocupado — feche adb.exe / Android Studio / outras abas e tente de novo.",adb_lost:"Cabo desplugado ou dispositivo re-enumerado.",adb_switching:"Ativando TCP/IP… (o USB vai cair — é normal).",adb_connected:"conectado",adb_ip_none:"IP não encontrado — conecte ao Wi-Fi primeiro.",adb_tcpip_ok:"ADB via Wi-Fi ativado. Agora rode:",adb_use:"usar",adb_apps:"apps",adb_no_apps:"Sem apps listados ainda — conecte um dispositivo.",adb_no_dev:"Nenhum dispositivo com permissão ainda — clique em Detectar.",b_copy:"Copiar comando",b_desktop:"Baixar .desktop",b_bat:"Baixar .ps1 do atalho",b_sh:"Baixar .sh",b_ps1:"Baixar .ps1",sum_desktop:"Prévia do .desktop gerado",sum_bat:"Prévia do .lnk gerado (Target + Arguments)",h_dl_lin:"O oneliner instala o scrcpy e cria o atalho. O .desktop é só o atalho (para quem já tem o scrcpy instalado) — salve em ~/.local/share/applications/.",h_dl_win:"O comando instala o scrcpy e cria o atalho .lnk direto no scrcpy.exe. O .ps1 do atalho cria o mesmo .lnk (para quem já tem o scrcpy) — rode no PowerShell.",ntc_offline:"NameToColor.js offline: nomes arbitrários e paleta por mood indisponíveis — use o seletor de cor.",a_mood:"Tema do ícone",g_moods:"Moods",g_nature:"Natureza",g_materials:"Materiais",g_audience:"Público",g_occasions:"Ocasiões",g_styles:"Estilos",g_industry:"Indústrias"};
+var PT={t_doc:"Abrir documentação oficial do scrcpy em nova aba",v_excl:"--prefer-text e --raw-key-events são mutuamente exclusivos.",v_sdk:"--prefer-text/--raw-key-events exigem --keyboard=sdk.",v_mouse:"--mouse=sdk requer playback de vídeo (desmarque --no-video ou use uhid).",v_dup:"--audio-dup exige --audio-source=playback.",v_cam:"Opções de câmera exigem fonte = camera (aplicado automaticamente).",v_verreq:"As flags marcadas exigem scrcpy v{v} ou superior.",v_hwdec:"--hwdec precisa de reprodução de vídeo ativa; desmarque --no-video.",v_otg:"--otg desabilita espelhamento; conflita com fonte camera.",copied:"Copiado!",s_adb:"Dispositivos (WebADB via USB)",h_adb:"Conecte o celular por USB com depuração USB ativada. Chrome/Edge desktop (HTTPS) detecta serial, IP e apps para autocompletar o formulário.",b_adbadd:"＋ Detectar dispositivo USB",b_adbrefresh:"Atualizar",h_adbpriv:"Tudo local: a chave RSA fica no IndexedDB do seu navegador; nenhum dado sai daqui. Feche adb.exe/Android Studio antes (só 1 conexão por vez).",h_startapp:"Digite para buscar; Enter usa o pacote. Prefixos: + força-stop, ? busca por nome.",adb_no_usb:"WebUSB precisa de Chrome/Edge/Opera no desktop (HTTPS).",adb_cancel:"Cancelado — nenhum dispositivo escolhido.",adb_need_gesture:"Clique no botão para abrir o seletor USB.",adb_authorize:"Olhe a tela do celular — toque em “Permitir depuração USB”…",adb_busy:"Dispositivo ocupado — feche adb.exe / Android Studio / outras abas e tente de novo.",adb_lost:"Cabo desplugado ou dispositivo re-enumerado.",adb_connected:"conectado",adb_use:"usar",adb_apps:"apps",adb_no_apps:"Sem apps listados ainda — conecte um dispositivo.",adb_no_dev:"Nenhum dispositivo com permissão ainda — clique em Detectar.",b_copy:"Copiar comando",b_desktop:"Baixar .desktop",b_bat:"Baixar .ps1 do atalho",b_sh:"Baixar .sh",b_ps1:"Baixar .ps1",sum_desktop:"Prévia do .desktop gerado",sum_bat:"Prévia do .lnk gerado (Target + Arguments)",h_dl_lin:"O oneliner instala o scrcpy e cria o atalho. O .desktop é só o atalho (para quem já tem o scrcpy instalado) — salve em ~/.local/share/applications/.",h_dl_win:"O comando instala o scrcpy e cria o atalho .lnk direto no scrcpy.exe. O .ps1 do atalho cria o mesmo .lnk (para quem já tem o scrcpy) — rode no PowerShell.",ntc_offline:"NameToColor.js offline: nomes arbitrários e paleta por mood indisponíveis — use o seletor de cor.",a_mood:"Tema do ícone",g_moods:"Moods",g_nature:"Natureza",g_materials:"Materiais",g_audience:"Público",g_occasions:"Ocasiões",g_styles:"Estilos",g_industry:"Indústrias"};
 /* ---- NameToColor.js: cores arbitrárias + paleta por mood (zonaro/NameToColor) ---- */
 var ICON_SLOTS=[{color:"iconBg",name:"iconBgName",hint:"iconBgHint"},{color:"iconFg",name:"iconFgName",hint:"iconFgHint"},{color:"iconEyes",name:"iconEyesName",hint:"iconEyesHint"},{color:"iconScreen",name:"iconScreenName",hint:"iconScreenHint"}];
 var MOOD_GROUPS=[["g_moods",["Vibrant","Futuristic","Fun","Soft Pastel","Calm","Vintage","Organic","Sophisticated","Dark","Corporate"]],["g_nature",["Nature","Forest","Water","Ocean","Beach","Mountain","Desert","Tropical","Floral","Earth","Sky","Sunset","Night","Space","Spring","Summer","Autumn","Winter"]],["g_materials",["Metal","Gold","Silver","Copper","Wood","Stone","Concrete","Glass"]],["g_audience",["Children","Baby","Youth","Wellness","Luxury"]],["g_occasions",["Wedding","Romance","Celebration"]],["g_styles",["Minimal"]],["g_industry",["Coffee","Food","Restaurant","Agriculture","Industry","Construction","Automotive","Technology","Gaming","Healthcare","Finance","Education","Science","Energy","Sustainability","Real Estate","Travel","Sports","Music","Fashion","Retail","Security","Beauty","Pets"]]];
@@ -976,7 +974,6 @@ var SCRCPY_DOC_BASE="https://github.com/Genymobile/scrcpy/blob/"+SCRCPY_TAG+"/";
 var INSTALLER_REPO="https://github.com/zonaro/scrcpy-installer";
 var SCRCPY_DOCS={
 os:INSTALLER_REPO,shortcutName:INSTALLER_REPO,scrVersion:INSTALLER_REPO,customVer:INSTALLER_REPO,desktopFile:INSTALLER_REPO,
-adbAutoTcpip:INSTALLER_REPO,
 serial:"doc/connection.md#selection",selUsb:"doc/connection.md#selection",selTcpip:"doc/connection.md#selection",
 tcpip:"doc/connection.md#tcpip-wireless",tcpipFlag:"doc/connection.md#tcpip-wireless",port:"doc/tunnels.md#remote-adb-server",
 maxSize:"doc/video.md#size",bitrate:"doc/video.md#bit-rate",maxFps:"doc/video.md#frame-rate",printFps:"doc/video.md#frame-rate",
@@ -1087,12 +1084,10 @@ window.__adbRenderList=function(){
     var grow=document.createElement("span");grow.className="grow";
     var b=document.createElement("b");b.textContent=d.model||d.serial;grow.appendChild(b);
     var code=document.createElement("code");code.textContent=d.serial;grow.appendChild(document.createTextNode(" "));grow.appendChild(code);
-    (d.ips||[]).forEach(function(ip){var c2=document.createElement("code");c2.textContent=ip+":5555";grow.appendChild(document.createTextNode(" "));grow.appendChild(c2);});
     var meta=document.createElement("small");meta.style.cssText="color:var(--muted)";meta.textContent=" · "+(d.pkgs||[]).length+" "+T("adb_apps");grow.appendChild(document.createTextNode(" "));grow.appendChild(meta);
     row.appendChild(grow);
     function mkBtn(label,fn){var btn=document.createElement("button");btn.type="button";btn.className="ghost";btn.textContent=label;btn.addEventListener("click",fn);row.appendChild(btn);return btn;}
     mkBtn("serial: "+T("adb_use"),function(){var el=$("serial");if(el){el.value=d.serial;try{update();}catch(e){}el.focus();}});
-    if(d.ips&&d.ips[0])mkBtn(d.ips[0]+":5555",function(){var el=$("tcpip");if(el){el.value=d.ips[0]+":5555";var f=$("tcpipFlag");if(f)f.checked=true;try{update();}catch(e){}el.focus();}});
     box.appendChild(row);
   });
 };
@@ -1176,57 +1171,12 @@ function upsertDevice(info,adbRef,rawDevice){
   s.pkgs.sort((a,b)=>a.pkg.localeCompare(b.pkg));
   try{ window.__adbRenderList(); window.__adbUpdateDatalists(); }catch(e){}
 }
-let tcpipSwitching=false;
-async function enableTcpipFor(entry){
-  const adb=entry&&entry.adb;
-  if(!adb){
-    // Sem handle USB vivo mas com IP conhecido: o aparelho provavelmente já
-    // está em modo TCP/IP (o USB cai após o switch) — só orienta o connect.
-    const known=(entry&&entry.ips&&entry.ips[0])||"";
-    if(!known){ say("adb_no_dev","err"); return null; }
-    const tcpEl0=$("tcpip");
-    if(tcpEl0&&!tcpEl0.value) tcpEl0.value=known+":5555";
-    const flag0=$("tcpipFlag"); if(flag0) flag0.checked=true;
-    try{ window.__adbSetStatus(T("adb_tcpip_ok")+" adb connect "+known+":5555","ok"); }catch(e){}
-    return known;
-  }
-  let ips=entry.ips||[];
-  if(!ips.length){ const out=await shellText(adb,["ip","-f","inet","addr","show","scope","global"]); ips=parseIps(out); entry.ips=ips; }
-  if(!ips.length){ say("adb_ip_none","err"); return null; }
-  say("adb_switching","");
-  tcpipSwitching=true;
-  try{
-    // setPort() exige a resposta exata do adbd ("restarting in TCP mode port:
-    // 5555"); o transporte USB pode cair no meio da leitura mesmo com sucesso
-    // — nesse caso a mensagem do erro carrega a confirmação, então aceita.
-    let output="";
-    try{ output=await adb.tcpip.setPort(5555); }
-    catch(e){
-      output=String((e&&e.message)||e||"");
-      if(!/restarting in TCP mode port:\s*5555/.test(output)) throw e;
-    }
-  }catch(e){
-    tcpipSwitching=false;
-    say("adb_lost","err");
-    return null;
-  }
-  // Daqui em diante o USB re-enumera e o handle morre: descarta para nada
-  // reutilizar conexão morta (sem close() — o endpoint já sumiu).
-  entry.adb=null;
-  const tcpEl=$("tcpip");
-  if(tcpEl&&!tcpEl.value) tcpEl.value=ips[0]+":5555";
-  const flag=$("tcpipFlag"); if(flag) flag.checked=true;
-  try{ window.__adbUpdateDatalists(); }catch(e){}
-  try{ window.__adbSetStatus(T("adb_tcpip_ok")+" adb connect "+ips[0]+":5555","ok"); }catch(e){}
-  setTimeout(function(){ tcpipSwitching=false; },8000);
-  return ips[0];
-}
 let manager=null,credStore=null,observer=null;
 try{ manager=AdbDaemonWebUsbDeviceManager.BROWSER||null; }catch(e){ manager=null; }
 try{ credStore=new AdbWebCredentialStore("ScrcpyInstaller"); }catch(e){ credStore=null; }
 function gate(){
   const ok=!!(manager&&navigator.usb);
-  ["adbConnect","adbRefresh","adbTcpip"].forEach(id=>{ const b=$(id); if(b) b.disabled=!ok; });
+  ["adbConnect","adbRefresh"].forEach(id=>{ const b=$(id); if(b) b.disabled=!ok; });
   if(!ok) say("adb_no_usb","err");
   return ok;
 }
@@ -1252,9 +1202,7 @@ async function connectOne(){
   const serial=adb.serial||device.serial||"usb-device";
   const info=await collectInfo(adb,serial);
   upsertDevice(info,adb,device);
-  try{ window.__adbSetStatus(serial+" · "+T("adb_connected")+(info.model?" · "+info.model:"")+(info.ips[0]?" · "+info.ips[0]+":5555":""),"ok"); }catch(e){}
-  const auto=$("adbAutoTcpip");
-  if(auto&&auto.checked){ const entry=store().devices.find(d=>d.serial===serial); if(entry) await enableTcpipFor(entry); }
+  try{ window.__adbSetStatus(serial+" · "+T("adb_connected")+(info.model?" · "+info.model:"")+(info.ips[0]?" · "+info.ips[0]:""),"ok"); }catch(e){}
   try{ if(device.raw&&device.raw.forget){} }catch(e){}
 }
 async function refresh(){
@@ -1267,20 +1215,13 @@ async function refresh(){
     say("adb_connected","");
   }catch(e){ say("adb_lost","err"); }
 }
-async function tcpipAll(){
-  if(!gate()) return;
-  const devs=store().devices;
-  if(!devs.length){ say("adb_no_dev","err"); return; }
-  for(const d of devs){ await enableTcpipFor(d); }
-}
 try{
   $("adbConnect").addEventListener("click",()=>{ connectOne().catch(()=>say("adb_lost","err")); });
   $("adbRefresh").addEventListener("click",()=>{ refresh().catch(()=>say("adb_lost","err")); });
-  $("adbTcpip").addEventListener("click",()=>{ tcpipAll().catch(()=>say("adb_lost","err")); });
   gate();
   try{ window.__adbRenderList(); }catch(e){}
   if(manager&&manager.trackDevices){
-    manager.trackDevices().then(obs=>{ observer=obs; try{ obs.onListChange(()=>{ if(tcpipSwitching) return; try{refresh();}catch(e){} }); }catch(e){} }).catch(()=>{});
+    manager.trackDevices().then(obs=>{ observer=obs; try{ obs.onListChange(()=>{ try{refresh();}catch(e){} }); }catch(e){} }).catch(()=>{});
   }
 }catch(e){}
 </script>

@@ -205,8 +205,7 @@ via `setIconColor()`.
 ## WebADB device panel (USB only, Chromium desktop + HTTPS)
 
 - Section `#s-adb`: buttons `#adbConnect` (requestDevice), `#adbRefresh`
-  (granted devices), `#adbTcpip` (tcpip all connected), checkbox
-  `#adbAutoTcpip` (auto wireless on connect), status `#adbStatus`,
+  (granted devices), status `#adbStatus`,
   list `#adbList`. Non-Chromium/no-WebUSB disables the buttons with
   `adb_no_usb`. Classic-script helpers on `window` (`__adbStore`,
   `__adbSetStatus/__adbRenderList/__adbUpdateDatalists`, `window.ScrGen.t`
@@ -222,24 +221,16 @@ via `setIconColor()`.
   (fallback `pm list packages -3`, then full `pm list packages`).
 - Serial/IP autocomplete: `#serialList`/`#tcpipList` datalists rebuilt from
   `__adbStore.devices` (serial + `ip`/`ip:5555` with model labels); device
-  cards have `usar` buttons filling `#serial` / `#tcpip` (+`#tcpipFlag`).
-- Wireless: IP is read BEFORE `adb.tcpip.setPort(5555)` (USB link dies on
-  restart). `setPort()` asserts adbd's exact reply (`restarting in TCP mode
-  port: 5555`), so its throw is only tolerated when the message carries that
-  confirmation — any other throw reports `adb_lost`. On success the dead USB
-  handle is dropped (`entry.adb=null`, no `close()`) and the UI shows
-  `adb connect IP:5555`; re-clicking with a known IP but no live handle just
-  re-shows the connect command. A `tcpipSwitching` guard stops the
-  `trackDevices` observer's `refresh()` from overwriting the success status
-  during USB re-enumeration. No Wi-Fi reconnect from the page (no raw TCP
+  cards have `usar` button filling `#serial`.
+- No Wi-Fi activate/reconnect from the page (no raw TCP
   in browsers; Tango needs a native bridge).
 - `--start-app` autocomplete: `#startApp` + `#appSuggest` custom dropdown
   (classic script, no imports). Merged+deduped `__adbStore.pkgs`
   (`{pkg, device}`), substring match, launchable-first ordering, max 30,
   mouse+ArrowUp/Down+Enter+Escape, preserves scrcpy `+`/`?` prefixes on pick.
-  i18n keys: `s_adb/h_adb/b_adbadd/b_adbrefresh/b_adbtcpip/f_autotcpip/
-  h_autotcpip/h_adbpriv/h_startapp/adb_no_usb/adb_cancel/adb_need_gesture/
-  adb_authorize/adb_busy/adb_lost/adb_switching/adb_connected/adb_ip_none/adb_tcpip_ok/
+  i18n keys: `s_adb/h_adb/b_adbadd/b_adbrefresh/
+  h_adbpriv/h_startapp/adb_no_usb/adb_cancel/adb_need_gesture/
+  adb_authorize/adb_busy/adb_lost/adb_connected/
   adb_use/adb_apps/adb_no_apps/adb_no_dev` (pt inline + en + es).
 
 ## Page internals (for automation)
